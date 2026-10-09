@@ -16,6 +16,7 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -56,6 +58,22 @@ class AuthIntegrationTest {
         @GetMapping("/api/test/whoami")
         AuthUser whoami(AuthUser user) {
             return user;
+        }
+
+        @GetMapping("/api/test/security-context")
+        Map<String, Object> securityContext(Authentication authentication) {
+            AuthUser user = (AuthUser) authentication.getPrincipal();
+            return Map.of(
+                    "userId", user.id(),
+                    "authorities", authentication.getAuthorities().stream()
+                            .map(authority -> authority.getAuthority())
+                            .sorted()
+                            .toList());
+        }
+
+        @GetMapping("/api/test/public")
+        Map<String, String> publicEndpoint() {
+            return Map.of("status", "public");
         }
     }
 
@@ -114,6 +132,22 @@ class AuthIntegrationTest {
                 .andExpect(jsonPath("$.id").value(USER_ID))
                 .andExpect(jsonPath("$.groupId").value(GROUP_ID))
                 .andExpect(jsonPath("$.admin").value(true));
+    }
+
+    @Test
+    void validTokenPopulatesTheSpringSecurityContextAndAuthorities() throws Exception {
+        mvc.perform(get("/api/test/security-context").header("Authorization", "Bearer " + userToken(USER_ID)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(USER_ID))
+                .andExpect(jsonPath("$.authorities[0]").value("ROLE_ADMIN"))
+                .andExpect(jsonPath("$.authorities[1]").value("ROLE_USER"));
+    }
+
+    @Test
+    void invalidCredentialsDoNotMakePublicRoutesPrivate() throws Exception {
+        mvc.perform(get("/api/test/public").header("Authorization", "Bearer nonsense"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("public"));
     }
 
     @Test
