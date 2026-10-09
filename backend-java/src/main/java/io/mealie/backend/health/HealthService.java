@@ -1,10 +1,8 @@
 package io.mealie.backend.health;
 
-import io.mealie.backend.auth.AuthService;
 import io.mealie.backend.auth.AuthUser;
 import io.mealie.backend.db.SqlDialect;
 import io.mealie.backend.web.ApiException;
-import java.util.Optional;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -26,17 +24,14 @@ public class HealthService {
 
     private final SqlDialect dialect;
     private final SchemaInfoRepository schema;
-    private final AuthService authService;
-
-    public HealthService(SqlDialect dialect, SchemaInfoRepository schema, AuthService authService) {
+    public HealthService(SqlDialect dialect, SchemaInfoRepository schema) {
         this.dialect = dialect;
         this.schema = schema;
-        this.authService = authService;
     }
 
-    public Health check(Optional<String> token) {
+    public Health check(boolean credentialsSupplied, AuthUser user, RuntimeException authFailure) {
         Database database = checkDatabase();
-        Auth auth = token.map(this::checkToken).orElse(null);
+        Auth auth = credentialsSupplied ? checkAuthentication(user, authFailure) : null;
         return new Health(database.connected() ? "ok" : "unavailable", dialect.engine().settingValue(), database, auth);
     }
 
@@ -48,14 +43,16 @@ public class HealthService {
         }
     }
 
-    private Auth checkToken(String token) {
-        try {
-            AuthUser user = authService.authenticate(token);
+    private Auth checkAuthentication(AuthUser user, RuntimeException failure) {
+        if (user != null) {
             return new Auth(true, user.id().toString(), user.username(), null);
-        } catch (ApiException e) {
-            return new Auth(false, null, null, e.detail());
-        } catch (DataAccessException e) {
+        }
+        if (failure instanceof DataAccessException) {
             return new Auth(false, null, null, "Database unavailable");
         }
+        String detail = failure instanceof ApiException apiException
+                ? apiException.detail()
+                : "Could not validate credentials";
+        return new Auth(false, null, null, detail);
     }
 }

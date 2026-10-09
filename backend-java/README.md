@@ -48,7 +48,10 @@ records. There is no JPA or Hibernate. The rules:
 
 ## Auth
 
-`auth/AuthService` verifies Mealie's HS256 JWTs exactly like `get_current_user()` in
+Spring Security owns the authentication flow. `MealieAuthenticationFilter` extracts credentials,
+`MealieAuthenticationProvider` delegates Mealie-compatible JWT validation to `auth/AuthService`, and the resulting
+`AuthUser` principal is stored in the `SecurityContext`. `auth/AuthService` verifies Mealie's HS256 JWTs exactly like
+`get_current_user()` in
 `mealie/core/dependencies/dependencies.py`:
 
 - The token comes from `Authorization: Bearer`, with the `mealie.access_token` cookie as fallback.
@@ -60,4 +63,6 @@ The secret is `<DATA_DIR>/.secret` in production, and `shh-secret-test-key` when
 It's read-only from Java and reloaded if the file changes. Errors use Python's body shape, `{"detail": ...}`, with
 the same status codes and headers.
 
-To require a user in a controller, declare a parameter: `public Foo get(AuthUser user)`.
+To require a user in a migrated controller, declare a parameter: `public Foo get(AuthUser user)`. The MVC bridge reads
+that principal from Spring Security rather than authenticating the request itself. Public routes remain public even if
+they receive bad credentials; a protected controller rejects them when it requests the current user.
