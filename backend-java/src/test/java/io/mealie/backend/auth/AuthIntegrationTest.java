@@ -95,14 +95,17 @@ class AuthIntegrationTest {
             st.executeUpdate("INSERT INTO alembic_version VALUES ('27621d27c7e1')");
             st.executeUpdate("""
                     CREATE TABLE users (id CHAR(32) NOT NULL PRIMARY KEY, username VARCHAR, admin BOOLEAN,
-                        group_id CHAR(32) NOT NULL, household_id CHAR(32), tokens_valid_after DATETIME)""");
+                        group_id CHAR(32) NOT NULL, household_id CHAR(32), tokens_valid_after DATETIME,
+                        can_organize BOOLEAN DEFAULT 0)""");
             st.executeUpdate("""
                     CREATE TABLE long_live_tokens (id CHAR(32) NOT NULL PRIMARY KEY, name VARCHAR NOT NULL,
                         token VARCHAR NOT NULL, user_id CHAR(32))""");
-            st.executeUpdate("INSERT INTO users VALUES ('" + hex(USER_ID) + "', 'admin', 1, '" + hex(GROUP_ID)
+            st.executeUpdate("INSERT INTO users (id, username, admin, group_id, household_id, tokens_valid_after) "
+                    + "VALUES ('" + hex(USER_ID) + "', 'admin', 1, '" + hex(GROUP_ID)
                     + "', NULL, NULL)");
             // Password changed at a known time: tokens issued before it are void.
-            st.executeUpdate("INSERT INTO users VALUES ('" + hex(LOCKED_OUT_USER_ID) + "', 'kai', 0, '"
+            st.executeUpdate("INSERT INTO users (id, username, admin, group_id, household_id, tokens_valid_after) "
+                    + "VALUES ('" + hex(LOCKED_OUT_USER_ID) + "', 'kai', 0, '"
                     + hex(GROUP_ID) + "', NULL, '2026-01-01 12:00:00.000000')");
         }
     }

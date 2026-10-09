@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    Tags, as RepositoryTags in mealie/repos/repository_factory.py reads and writes them. Query filters, searches and
+    orderings are built in Java as SqlFragments and spliced in with ${...}; their values stay bound parameters.
+-->
+<mapper namespace="io.mealie.backend.persistence.mapper.TagMapper">
+
+    <resultMap id="tagRow" type="io.mealie.backend.persistence.model.TagRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="group_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="slug" javaType="java.lang.String"/>
+            <arg column="created_at" javaType="java.time.OffsetDateTime"
+                 typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+            <arg column="update_at" javaType="java.time.OffsetDateTime"
+                 typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+            <arg column="recipe_count" javaType="_long"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="idRow" type="io.mealie.backend.persistence.model.IdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <!-- RepositoryTags._query(): every tag carries its recipe count as a correlated subquery. -->
+    <sql id="tagColumns">
+        (SELECT count(recipes_to_tags.recipe_id) FROM recipes_to_tags
+         WHERE recipes_to_tags.tag_id = tags.id) AS recipe_count,
+        tags.id, tags.group_id, tags.name, tags.slug, tags.created_at, tags.update_at
+    </sql>
+
+    <select id="count" resultType="long">
+        SELECT count(*) FROM tags WHERE ${where.sql}
+    </select>
+
+    <select id="page" resultMap="tagRow">
+        SELECT <include refid="tagColumns"/>
+        FROM tags
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+        <choose>
+            <when test="limit != null">LIMIT #{limit}</when>
+            <when test="sqlite">LIMIT -1</when>
+        </choose>
+        OFFSET #{offset}
+    </select>
+
+    <!-- The ids orderBy=random shuffles, in the order the database returns them. -->
+    <select id="ids" resultMap="idRow">
+        SELECT tags.id FROM tags
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+    </select>
+
+    <select id="findById" resultMap="tagRow">
+        SELECT <include refid="tagColumns"/>
+        FROM tags
+        WHERE tags.group_id = #{groupId} AND tags.id = #{id}
+    </select>
+
+    <select id="findBySlug" resultMap="tagRow">
+        SELECT <include refid="tagColumns"/>
+        FROM tags
+        WHERE tags.group_id = #{groupId} AND tags.slug = #{slug}
+    </select>
+
+    <!-- RepositoryTags.get_empty() selects the model without the count expression, so the count reads 0. -->
+    <select id="findEmpty" resultMap="tagRow">
+        SELECT 0 AS recipe_count, tags.id, tags.group_id, tags.name, tags.slug, tags.created_at, tags.update_at
+        FROM tags
+        WHERE NOT (EXISTS (SELECT 1 FROM recipes, recipes_to_tags
+                           WHERE tags.id = recipes_to_tags.tag_id AND recipes.id = recipes_to_tags.recipe_id))
+          AND tags.group_id = #{groupId}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO tags (id, group_id, name, slug, created_at, update_at)
+        VALUES (#{id}, #{groupId}, #{name}, #{slug}, #{createdAt}, #{updateAt})
+    </insert>
+
+    <update id="update">
+        UPDATE tags SET group_id = #{groupId}, name = #{name}, slug = #{slug}, update_at = #{updateAt}
+        WHERE tags.id = #{id}
+    </update>
+
+    <delete id="deleteRecipeLinks">
+        DELETE FROM recipes_to_tags
+        WHERE recipes_to_tags.tag_id = #{tagId}
+          AND recipes_to_tags.recipe_id IN (SELECT recipes.id FROM recipes)
+    </delete>
+
+    <delete id="delete">
+        DELETE FROM tags WHERE tags.id = #{id}
+    </delete>
+
+    <!-- RepositoryTags.merge(): move links that the target doesn't already have, then drop the rest. -->
+    <update id="moveRecipeLinks">
+        UPDATE recipes_to_tags SET tag_id = #{toId}
+        WHERE recipes_to_tags.tag_id = #{fromId}
+          AND (recipes_to_tags.recipe_id NOT IN (
+                SELECT recipes_to_tags.recipe_id FROM recipes_to_tags WHERE recipes_to_tags.tag_id = #{toId}))
+    </update>
+
+    <delete id="deleteAllRecipeLinks">
+        DELETE FROM recipes_to_tags WHERE recipes_to_tags.tag_id = #{tagId}
+    </delete>
+
+    <resultMap id="recipeSummaryRow" type="io.mealie.backend.persistence.model.RecipeSummaryRow">
+        <result property="recipeId" column="recipes_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="slug" column="recipes_slug"/>
+        <result property="groupId" column="recipes_group_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="userId" column="recipes_user_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="rating" column="recipes_rating" javaType="java.lang.Double"/>
+        <result property="name" column="recipes_name"/>
+        <result property="description" column="recipes_description"/>
+        <result property="image" column="recipes_image"/>
+        <result property="totalTime" column="recipes_total_time"/>
+        <result property="prepTime" column="recipes_prep_time"/>
+        <result property="performTime" column="recipes_perform_time"/>
+        <result property="cookTime" column="recipes_cook_time"/>
+        <result property="totalTimeSeconds" column="recipes_total_time_seconds" javaType="java.lang.Integer"/>
+        <result property="prepTimeSeconds" column="recipes_prep_time_seconds" javaType="java.lang.Integer"/>
+        <result property="performTimeSeconds" column="recipes_perform_time_seconds" javaType="java.lang.Integer"/>
+        <result property="recipeYield" column="recipes_recipe_yield"/>
+        <result property="recipeYieldQuantity" column="recipes_recipe_yield_quantity" javaType="java.lang.Double"/>
+        <result property="recipeServings" column="recipes_recipe_servings" javaType="java.lang.Double"/>
+        <result property="orgUrl" column="recipes_org_url"/>
+        <result property="dateAdded" column="recipes_date_added"
+                typeHandler="io.mealie.backend.persistence.typehandler.LocalDateTypeHandler"/>
+        <result property="dateUpdated" column="recipes_date_updated"
+                typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        <result property="lastMade" column="recipes_last_made"
+                typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        <result property="createdAt" column="recipes_created_at"
+                typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        <result property="updateAt" column="recipes_update_at"
+                typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        <result property="categoryId" column="categories_1_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="categoryGroupId" column="categories_1_group_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="categoryName" column="categories_1_name"/>
+        <result property="categorySlug" column="categories_1_slug"/>
+        <result property="toolId" column="tools_1_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="toolGroupId" column="tools_1_group_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="toolName" column="tools_1_name"/>
+        <result property="toolSlug" column="tools_1_slug"/>
+        <result property="tagId" column="tags_2_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="tagGroupId" column="tags_2_group_id"
+                typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        <result property="tagName" column="tags_2_name"/>
+        <result property="tagSlug" column="tags_2_slug"/>
+    </resultMap>
+
+    <!--
+        The selectin load of Tag.recipes with RecipeTagResponse.loader_options(), copied from the SQL SQLAlchemy
+        emits (same joins, same select list, no ORDER BY) so rows come back in the same order and nested lists keep
+        Python's order. Keep the select list identical, unused columns included: on SQLite it decides which
+        automatic covering index the planner builds, and with it the row order.
+    -->
+    <select id="recipeRows" resultMap="recipeSummaryRow">
+        SELECT tags_1.id AS tags_1_id, recipes.id AS recipes_id, recipes.slug AS recipes_slug,
+               recipes.group_id AS recipes_group_id, recipes.user_id AS recipes_user_id,
+               recipes.rating AS recipes_rating, recipes.name AS recipes_name,
+               recipes.description AS recipes_description, recipes.image AS recipes_image,
+               recipes.total_time AS recipes_total_time, recipes.prep_time AS recipes_prep_time,
+               recipes.perform_time AS recipes_perform_time,
+               recipes.total_time_seconds AS recipes_total_time_seconds,
+               recipes.prep_time_seconds AS recipes_prep_time_seconds,
+               recipes.perform_time_seconds AS recipes_perform_time_seconds,
+               recipes.recipe_yield AS recipes_recipe_yield,
+               recipes.recipe_yield_quantity AS recipes_recipe_yield_quantity,
+               recipes.recipe_servings AS recipes_recipe_servings, recipes.org_url AS recipes_org_url,
+               recipes.date_added AS recipes_date_added, recipes.date_updated AS recipes_date_updated,
+               recipes.last_made AS recipes_last_made, recipes.name_normalized AS recipes_name_normalized,
+               recipes.description_normalized AS recipes_description_normalized,
+               recipes.cook_time AS recipes_cook_time, recipes."recipeCuisine" AS "recipes_recipeCuisine",
+               recipes.is_ocr_recipe AS recipes_is_ocr_recipe, recipes.created_at AS recipes_created_at,
+               recipes.update_at AS recipes_update_at, 0 AS anon_1,
+               categories_1.group_id AS categories_1_group_id, categories_1.id AS categories_1_id,
+               categories_1.name AS categories_1_name, categories_1.slug AS categories_1_slug,
+               categories_1.created_at AS categories_1_created_at,
+               categories_1.update_at AS categories_1_update_at, 0 AS anon_2,
+               tools_1.id AS tools_1_id, tools_1.group_id AS tools_1_group_id, tools_1.name AS tools_1_name,
+               tools_1.slug AS tools_1_slug, tools_1.on_hand AS tools_1_on_hand,
+               tools_1.created_at AS tools_1_created_at, tools_1.update_at AS tools_1_update_at, 0 AS anon_3,
+               tags_2.id AS tags_2_id, tags_2.group_id AS tags_2_group_id, tags_2.name AS tags_2_name,
+               tags_2.slug AS tags_2_slug, tags_2.created_at AS tags_2_created_at,
+               tags_2.update_at AS tags_2_update_at
+        FROM tags AS tags_1
+        JOIN recipes_to_tags AS recipes_to_tags_1 ON tags_1.id = recipes_to_tags_1.tag_id
+        JOIN recipes ON recipes.id = recipes_to_tags_1.recipe_id
+        LEFT OUTER JOIN (recipes_to_categories AS recipes_to_categories_1
+                JOIN categories AS categories_1 ON categories_1.id = recipes_to_categories_1.category_id)
+            ON recipes.id = recipes_to_categories_1.recipe_id
+        LEFT OUTER JOIN (recipes_to_tools AS recipes_to_tools_1
+                JOIN tools AS tools_1 ON tools_1.id = recipes_to_tools_1.tool_id)
+            ON recipes.id = recipes_to_tools_1.recipe_id
+        LEFT OUTER JOIN (recipes_to_tags AS recipes_to_tags_2
+                JOIN tags AS tags_2 ON tags_2.id = recipes_to_tags_2.tag_id)
+            ON recipes.id = recipes_to_tags_2.recipe_id
+        WHERE tags_1.id IN (#{tagId})
+    </select>
+</mapper>

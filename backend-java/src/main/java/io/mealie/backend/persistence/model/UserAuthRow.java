@@ -10,5 +10,6 @@ public record UserAuthRow(
         UUID groupId,
         UUID householdId,
         Boolean admin,
+        Boolean canOrganize,
         OffsetDateTime tokensValidAfter) {
 }

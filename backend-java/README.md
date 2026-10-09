@@ -2,7 +2,8 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). The gateway currently sends `GET /api/app/about` to Java; other routes remain on Python.
+(`JAVA_API_PORT`). The gateway currently sends `GET /api/app/about` and everything under `/api/organizers/tags` to
+Java; other routes remain on Python.
 
 ```bash
 task java           # run against the same database as `task py`
@@ -66,3 +67,38 @@ the same status codes and headers.
 To require a user in a migrated controller, declare a parameter: `public Foo get(AuthUser user)`. The MVC bridge reads
 that principal from Spring Security rather than authenticating the request itself. Public routes remain public even if
 they receive bad credentials; a protected controller rejects them when it requests the current user.
+
+## Matching Python exactly
+
+A migrated route must answer like the Python route did, including its errors, because the frontend and API clients
+can't tell which backend served them. The helpers for that:
+
+- **Validation (`web/validation/`).** Controllers validate parameters by hand with `ValidationErrors`, in FastAPI's
+  order (path, query, body), and throw them together as one 422. `ApiExceptionHandler` renders the 422 the way
+  Python does: FastAPI's `{"detail": [...]}` in production, and Mealie's debug body (`status_code`/`message`/`data`)
+  otherwise. The debug message includes the Python endpoint's source location, so annotate each method with
+  `@PythonEndpoint`. Declare `PyRequestBody` *before* `AuthUser`, because FastAPI parses the body before it
+  authenticates.
+- **Python behaviour (`compat/`).** These are ports of `json.loads` (with its error messages), pydantic's UUID4 and int
+  parsing, `repr()`, python-slugify (with text-unidecode's own table), and `random.seed(str)` + `shuffle`.
+  `PythonCompatibilityTest` checks them against outputs recorded from Python by `dev/rebuild/compat_vectors.py`.
+- **Pagination and query filters (`query/`).** `PaginationQuery`, `PageRequest` and `Pagination` reproduce
+  `RepositoryGeneric.page_all()`. `QueryFilterSql` ports QueryFilterBuilder; attribute paths resolve through the
+  model descriptions in `FilterEntities`. A path that goes through a relationship not described there gets a 400
+  saying so (Python would follow any relationship), so add descriptions as routes need them.
+- **Unhandled errors** are a plain-text `Internal Server Error` 500, like Starlette. Python routes that crash on bad
+  input (e.g. `PUT /api/organizers/tags/{unknown id}`) crash the same way in Java on purpose.
+- **SQL that relies on row order.** Where Python returns rows without an ORDER BY (eager-loaded relationships), copy
+  SQLAlchemy's statement exactly, including its select list. On SQLite the select list decides which automatic index
+  the planner builds, and that changes the order.
+
+## Events
+
+Notifications (Household > Notifiers) go through Python's event bus, which owns the Apprise integration. After a
+write commits, `events/EventBridge` posts the event to Python's `POST /api/internal/events`
+(`mealie/routes/internal/controller_events.py`). It sends the event type, the document data, and a translation key
+with parameters, and forwards the request's `Accept-Language`, so Python renders the same message it would have sent.
+Requests are signed with an HMAC derived from the shared secret, and the gateway answers `/api/internal/*` with a 404.
+Delivery is asynchronous and failures are only logged, like Python's background tasks. Java finds Python at
+`MEALIE_PYTHON_URL`, which defaults to `http://127.0.0.1:${API_PORT:-9000}`. To publish a new kind of event, add its
+document type (and URL builder, if any) to that Python module.

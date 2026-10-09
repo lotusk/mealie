@@ -32,8 +32,9 @@ public class UserAuthRepository {
     }
 
     private UserAuthRecord toRecord(UserAuthRow row) {
-        AuthUser user = new AuthUser(
-                row.id(), row.username(), row.groupId(), row.householdId(), Boolean.TRUE.equals(row.admin()));
+        AuthUser user = new AuthUser(row.id(), row.username(), row.groupId(), row.householdId(),
+                Boolean.TRUE.equals(row.admin()), Boolean.TRUE.equals(row.canOrganize()),
+                AuthUser.DEFAULT_INTEGRATION_ID);
         return new UserAuthRecord(user, row.tokensValidAfter());
     }
 }
