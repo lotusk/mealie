@@ -1,7 +1,8 @@
 # Migration gateway
 
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
-**:8080** sits in front of both and decides, per path, which backend answers. Today every path goes to Python.
+**:8080** sits in front of both and decides, per path, which backend answers. `/api/app/about` and
+`/api/organizers/tags` (including its subpaths) go to Java. Other public paths go to Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐
@@ -149,3 +150,12 @@ Only add **read-only** cases. Both backends write to the same database, so a POS
 `task java:test` runs the unit and integration tests on a throwaway SQLite file. `task java:test:db ENGINE=sqlite`
 and `task java:test:db ENGINE=postgres` also check the dialect read-only against the dev database Python created
 (UUIDs, booleans, datetimes, dates, enums). See `backend-java/README.md`.
+
+## Migrated tags
+
+The tags matcher lists both `/api/organizers/tags` and `/api/organizers/tags/*`, so sibling prefixes stay on Python.
+Java owns all methods in this endpoint group. The signed `/api/internal/java/tag-events` notification bridge is
+blocked at the gateway and called directly by Java; configure `PYTHON_API_URL` if Python runs elsewhere.
+
+Run `task java:test:tags ENGINE=sqlite` and `task java:test:tags ENGINE=postgres` to compare tags with Python using
+throwaway Alembic databases and verify that Java writes remain compatible with Python's recipe endpoints.

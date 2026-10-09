@@ -34,6 +34,10 @@
 	# for it that points at {$PYTHON_UPSTREAM}.
 	# ---------------------------------------------------------------------------------------------
 
+	@tags path /api/organizers/tags /api/organizers/tags/*
+	reverse_proxy @tags {$JAVA_UPSTREAM}
+	# The notification bridge is called directly by Java, never by clients.
+	respond /api/internal/java/* 404
 	reverse_proxy /api/app/about {$JAVA_UPSTREAM}
 	reverse_proxy {$PYTHON_UPSTREAM}
 }

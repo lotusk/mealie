@@ -41,6 +41,29 @@ public abstract sealed class SqlDialect {
 
     public abstract DbEngine engine();
 
+    /** Spring does not classify SQLite extended constraint codes consistently. */
+    public boolean isUniqueViolation(Throwable error) {
+        for (Throwable cause = error; cause != null; cause = cause.getCause()) {
+            if (cause instanceof SQLException sql && "23505".equals(sql.getSQLState())) return true;
+            if (cause instanceof org.sqlite.SQLiteException sqlite
+                    && sqlite.getResultCode() == org.sqlite.SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) return true;
+        }
+        return false;
+    }
+
+    /** Mealie uses pg_trgm for unquoted searches and LIKE tokens for quoted searches and SQLite. */
+    public boolean usesFuzzySearch(String search) {
+        return engine() == DbEngine.POSTGRES && !search.contains("\"") && !search.contains("'");
+    }
+
+    public String fuzzySearchPredicate(String column, String parameter) {
+        return "word_similarity(" + parameter + ", " + column + ") >= 0.5";
+    }
+
+    public String fuzzySearchOrder(String column, String parameter) {
+        return column + " <->> " + parameter;
+    }
+
     // -- parameters ---------------------------------------------------------------------------------------------
 
     public abstract Object uuid(UUID value);

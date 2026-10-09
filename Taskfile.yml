@@ -397,6 +397,15 @@ tasks:
     cmds:
       - ./mvnw -B test
 
+  java:test:tags:
+    desc: compares Java tags with Python on a disposable Alembic database (ENGINE=sqlite|postgres)
+    deps:
+      - java:package
+    vars:
+      ENGINE: '{{default "sqlite" .ENGINE}}'
+    cmds:
+      - uv run python dev/rebuild/test_tags_migration.py --engine {{.ENGINE}}
+
   java:package:
     desc: builds the Java backend jar in backend-java/target
     dir: backend-java

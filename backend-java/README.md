@@ -2,7 +2,7 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). The gateway currently sends `GET /api/app/about` to Java; other routes remain on Python.
+(`JAVA_API_PORT`). The gateway sends `/api/app/about` and the complete `/api/organizers/tags` endpoint group to Java; other routes remain on Python.
 
 ```bash
 task java           # run against the same database as `task py`
@@ -66,3 +66,35 @@ the same status codes and headers.
 To require a user in a migrated controller, declare a parameter: `public Foo get(AuthUser user)`. The MVC bridge reads
 that principal from Spring Security rather than authenticating the request itself. Public routes remain public even if
 they receive bad credentials; a protected controller rejects them when it requests the current user.
+
+## Tags migration
+
+Tags use the existing Alembic tables, scoped to the authenticated user's group. Java owns list/search/pagination,
+empty tags, ID and slug reads, create/update/delete, and merge. Mutations require `users.can_organize`; merge and
+association cleanup run in one transaction. Recipe summaries retain Python's response shapes, including nested
+organizers and household tool availability.
+
+Tag notifications still use Python's shared event service. After a successful commit Java calls the signed internal
+`/api/internal/java/tag-events` bridge directly, forwarding the user's credentials and language. Python retains
+translation, integration IDs, household fan-out, webhooks, and Apprise delivery. The gateway blocks this internal
+path. Set `PYTHON_API_URL` when Python is not at `http://localhost:9000`; use the direct backend URL, not the gateway.
+Notification failures are logged without changing the committed mutation's response, as with Python's background
+notification delivery.
+
+`TagSlug` uses the unmodified text-unidecode 1.3 table in `src/main/resources/text-unidecode/`, distributed under
+its included Artistic License, to match python-slugify for non-ASCII names. `PythonRandom` matches CPython's string
+seed and shuffle for stable random pagination.
+
+Validation:
+
+```bash
+task java:test                      # HTTP and database integration tests on disposable SQLite
+TAG_TEST_POSTGRES_URL='jdbc:postgresql://localhost:5432/mealie?user=mealie&password=mealie' task java:test
+# Postgres integration tests create and drop an isolated schema.
+task java:test:tags ENGINE=sqlite
+task java:test:tags ENGINE=postgres   # uses POSTGRES_SERVER/PORT/USER/PASSWORD; creates and drops a temporary DB
+```
+
+The last two commands build Java, create a database through Python/Alembic, start both backends on temporary ports
+19000/19100, compare response bodies (unordered ORM associations by membership), and exercise Java writes with Python recipe reads/updates. They leave the
+development database untouched.

@@ -3,13 +3,40 @@
     "name": "list foods",
     "method": "GET",
     "path": "/api/foods?page=1&perPage=50",
-    "ignore": ["items.*.updatedAt"]
+    "ignore": [
+      "items.*.updatedAt"
+    ]
   },
   "cases": [
     {
       "name": "public app information",
       "method": "GET",
       "path": "/api/app/about"
+    },
+    {
+      "name": "tags ordered by name",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "all tags and recipe counts",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=name&perPage=-1"
+    },
+    {
+      "name": "empty tags",
+      "method": "GET",
+      "path": "/api/organizers/tags/empty"
+    },
+    {
+      "name": "tags search",
+      "method": "GET",
+      "path": "/api/organizers/tags?search=%22dinner%22"
+    },
+    {
+      "name": "tags filter",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name%20LIKE%20%22%25dinner%25%22"
     }
   ]
 }

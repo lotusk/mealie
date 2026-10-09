@@ -16,8 +16,10 @@ from . import (
     users,
     validators,
 )
+from .organizers import controller_java_tag_events
 
 router = APIRouter(prefix="/api")
+router.include_router(controller_java_tag_events.router)
 
 router.include_router(app.router)
 router.include_router(auth.router)
