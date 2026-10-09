@@ -2,7 +2,8 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). No API endpoints have been migrated yet.
+(`JAVA_API_PORT`). The authenticated `GET /api/recipes/{slug}` now runs here, accepting a recipe slug or UUID. Other application
+endpoints remain on Python.
 
 ```bash
 task java           # run against the same database as `task py`
@@ -64,3 +65,28 @@ It's read-only from Java and reloaded if the file changes. Errors use Python's b
 the same status codes and headers.
 
 To require a user in a controller, declare a parameter: `public Foo get(AuthUser user)`.
+
+## Single-recipe reads
+
+`recipe/RecipeController` delegates to a read-only service and JDBC repository. The response projects the existing
+Python-owned schema, including nested ingredients, referenced recipes, instructions, organizers, notes, assets,
+comments and calculated ingredient display. No request is forwarded to Python.
+
+The existing `AuthUser` resolver accepts session JWTs, registered API tokens and the access-token cookie. Reads
+are scoped to the authenticated user's group, including for admins. Python allows same-group reads across private
+households; recipe `public` and `locked` settings do not change this authenticated route's read access.
+Missing or other-group recipes return Python's 404 body; invalid authentication returns its 401 body and challenge.
+
+After `task java:package`, the reproducible HTTP matrix starts isolated Python and Java servers, initializes the
+schema with Python/Alembic, and compares actual status, full JSON and cache/auth headers:
+
+```bash
+uv run --frozen python dev/rebuild/recipe_get_parity.py --report /tmp/recipe-sqlite.json
+uv run --frozen python dev/rebuild/recipe_get_parity.py --gateway /path/to/caddy --report /tmp/recipe-gateway.json
+uv run --frozen python dev/rebuild/recipe_get_parity.py --engine postgres --gateway /path/to/caddy --report /tmp/recipe-postgres.json
+```
+
+For PostgreSQL, provide a fresh disposable database named `compx574_recipe_parity` on localhost:55432 with
+user/password `mealie`; the harness never uses the normal dev database. The SQLite database is temporary.
+The harness uses ports 9200/9210/9280, saves service logs beside its JSON report and stops its servers afterwards.
+With Caddy, it also verifies other routes still use Python and proves recipe reads work after Python is stopped.

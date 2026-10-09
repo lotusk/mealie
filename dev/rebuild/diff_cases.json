@@ -3,7 +3,20 @@
     "name": "list foods",
     "method": "GET",
     "path": "/api/foods?page=1&perPage=50",
-    "ignore": ["items.*.updatedAt"]
+    "ignore": [
+      "items.*.updatedAt"
+    ]
   },
-  "cases": []
+  "cases": [
+    {
+      "name": "missing recipe slug",
+      "method": "GET",
+      "path": "/api/recipes/compx574-absent-recipe"
+    },
+    {
+      "name": "missing recipe ID",
+      "method": "GET",
+      "path": "/api/recipes/00000000-0000-4000-8000-000000000000"
+    }
+  ]
 }

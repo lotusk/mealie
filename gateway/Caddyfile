@@ -34,5 +34,12 @@
 	# for it that points at {$PYTHON_UPSTREAM}.
 	# ---------------------------------------------------------------------------------------------
 
+	# Migrate only the single-recipe GET. Fixed GET routes and every other method stay on Python.
+	@recipeGet {
+		method GET
+		path_regexp recipeGet ^/api/recipes/[^/]+$
+		not path /api/recipes/suggestions /api/recipes/exports
+	}
+	reverse_proxy @recipeGet {$JAVA_UPSTREAM}
 	reverse_proxy {$PYTHON_UPSTREAM}
 }
