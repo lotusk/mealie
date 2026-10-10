@@ -91,7 +91,7 @@ public class AuthService {
         }
     }
 
-    static ApiException credentialsException() {
+    public static ApiException credentialsException() {
         return new ApiException(HttpStatus.UNAUTHORIZED, CREDENTIALS_DETAIL, Map.of("WWW-Authenticate", "Bearer"));
     }
 }

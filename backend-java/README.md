@@ -4,7 +4,15 @@ Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python bac
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
 (`JAVA_API_PORT`). The gateway sends the public app-about endpoints, authenticated `GET /api/recipes` listing, and
 `GET /api/recipes/{slug}` detail to Java. Detail accepts a recipe slug or UUID. Other application endpoints remain
-on Python.
+on Python. `POST /api/auth/token` now uses Java for local Mealie password login. Authenticated
+`GET /api/users/self` also uses Java; its sibling ratings/favorites routes and user writes remain on Python.
+Authenticated `GET /api/groups/self` uses Java too; group preferences and AI-provider summaries are read from the
+shared database without returning provider API keys. Other group routes remain on Python.
+
+The password login shares Python's user table, failed-attempt lockout, HS256 secret, token lifetime, and session
+cookie format. LDAP authentication still runs in Python: for LDAP deployments, start the gateway with
+`AUTH_TOKEN_UPSTREAM=host.docker.internal:9000`.
+Changing this gateway environment variable requires recreating the gateway container.
 
 ```bash
 task java           # run against the same database as `task py`
