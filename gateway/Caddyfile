@@ -62,6 +62,23 @@
 	}
 	reverse_proxy @groupSelf {$JAVA_UPSTREAM}
 
+	# Manual creation moves only this exact POST. Imports and other writes remain on Python.
+	@recipeCreate {
+		method POST
+		path /api/recipes
+	}
+	reverse_proxy @recipeCreate {$JAVA_UPSTREAM}
+
+	# Only the last-made PATCH moves; other recipe writes and timeline APIs stay on Python.
+	@recipeLastMade {
+		method PATCH
+		path_regexp recipeLastMade ^/api/recipes/[^/]+/last-made$
+	}
+	reverse_proxy @recipeLastMade {$JAVA_UPSTREAM}
+
+	# Internal event delivery is accessible only by a direct, signed service call.
+	respond /internal/* 404
+
 	# Recipe detail GET and exact listing GET are migrated. Fixed sibling routes and other methods stay on Python.
 	@recipeGet {
 		method GET

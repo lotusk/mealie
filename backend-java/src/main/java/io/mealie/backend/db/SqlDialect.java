@@ -45,6 +45,9 @@ public abstract sealed class SqlDialect {
 
     public abstract Object uuid(UUID value);
 
+    /** HouseholdService passes the original UUID spelling to SQLAlchemy; PostgreSQL validates that spelling. */
+    public Object recipeWriteLookupUuid(UUID value, String original) { return uuid(value); }
+
     public abstract Object bool(Boolean value);
 
     /** A UTC instant for a NaiveDateTime column. */
@@ -153,6 +156,9 @@ public abstract sealed class SqlDialect {
         public Object uuid(UUID value) {
             return value;
         }
+
+        @Override
+        public Object recipeWriteLookupUuid(UUID value, String original) { return original; }
 
         @Override
         public Object bool(Boolean value) {

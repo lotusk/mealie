@@ -2,8 +2,10 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). The gateway sends everything under `/api/organizers/tags`, the public app-about endpoints, authenticated `GET /api/recipes` listing, and
-`GET /api/recipes/{slug}` detail to Java. Detail accepts a recipe slug or UUID. Other application endpoints remain
+(`JAVA_API_PORT`). The gateway sends everything under `/api/organizers/tags`, the public app-about endpoints,
+authenticated `GET /api/recipes` listing, `GET /api/recipes/{slug}` detail, exact manual `POST /api/recipes`
+creation, and `PATCH /api/recipes/{slug}/last-made` to Java. Detail accepts a recipe slug or UUID. Other application
+endpoints remain
 on Python. `POST /api/auth/token` now uses Java for local Mealie password login. Authenticated
 `GET /api/users/self` also uses Java; its sibling ratings/favorites routes and user writes remain on Python.
 Authenticated `GET /api/groups/self` uses Java too; group preferences and AI-provider summaries are read from the
@@ -192,3 +194,101 @@ still has to match exactly.
 Search uses the unchanged text-unidecode 1.3 translation table from the Python dependency; the original Artistic
 Licence is included beside the table. This is data consumed by Java, with no Python process or HTTP forwarding.
 The table provenance and licence are documented in its resource directory.
+
+
+## Manual recipe creation
+
+Only exact `POST /api/recipes` moves to Java. The request remains `{"name": "My recipe"}`; additional fields are
+ignored, as in Python. Java performs validation, legacy slug generation (including its 250-character truncation),
+ten creation attempts for duplicate names, authenticated group/household ownership, localized ingredient/step
+text, household settings, empty nutrition and the first system timeline entry. MyBatis XML writes the unchanged
+Python/Alembic schema with parameters converted through `SqlDialect`. Creation and timeline commits retain the
+original Python failure boundary. A successful response is HTTP 201 with a JSON string containing the slug.
+
+Python still owns recipe imports, duplicate/edit/delete routes, timeline APIs and notification configuration.
+The approved event-only adapter preserves the existing Apprise delivery destinations and subscriber rules.
+Java sends signed metadata about an already committed recipe to `/internal/recipe-created`; the adapter verifies
+ownership, reads the recipe and dispatches `recipe_created` using the original EventBus/Apprise implementation.
+It never creates or updates recipe/timeline rows. The gateway rejects `/internal/*`, the adapter is absent from
+OpenAPI, and a dedicated HMAC key (minimum 32 UTF-8 bytes), timestamp window and process-local replay guard protect
+direct service calls. Original API tokens keep their integration ID in notification metadata.
+
+Configure both backend processes with the same dedicated key; keep it out of Git and experiment reports:
+
+```bash
+export RECIPE_EVENT_ADAPTER_KEY=$(uv run --frozen python -c 'import secrets; print(secrets.token_hex(32))')
+export RECIPE_EVENT_ADAPTER_URL=http://localhost:9000/internal/recipe-created
+task stack:sqlite
+```
+
+The key can also be supplied in the existing ignored repository `.env`; process environment wins. Java loads it
+at startup, so restart Java after changing it. Without a configured key, Java creation returns 503 before writing
+anything; other migrated endpoints continue working. Notification delivery runs after committed creation,
+matching FastAPI background delivery: delivery failures cannot undo creation and are explicitly logged as
+`RECIPE_CREATED_EVENT_FAILED`. Successful native creation logs `JAVA_RECIPE_CREATED`; the adapter logs
+`RECIPE_CREATED_EVENT_ADAPTER`. There is no durable notification queue or automatic retry, matching the original
+best-effort behavior; replay protection is local to one Python worker, not a cross-worker durable deduplication store.
+
+Reproducible tests use new databases only and preserve every fixture. They check raw POST responses, validation,
+authentication, ownership, defaults, actual Apprise HTTP delivery, concurrent names, signed adapter access,
+existing Java endpoints and gateway boundaries. Python's POST creation is then deliberately blocked while its
+event adapter stays available: Java creation, timeline insertion and real notifications must still succeed.
+
+```bash
+# Build to an independent directory if a preview is running from the normal target jar.
+task java:package
+uv run --frozen python dev/rebuild/recipe_create_parity.py --engine sqlite \
+  --jar backend-java/target/mealie-backend-0.0.1-SNAPSHOT.jar --gateway /path/to/caddy --report /tmp/create-sqlite.json
+uv run --frozen python dev/rebuild/recipe_create_parity.py --engine postgres --port-offset 200 \
+  --jar backend-java/target/mealie-backend-0.0.1-SNAPSHOT.jar --gateway /path/to/caddy --report /tmp/create-postgres.json
+```
+
+The PostgreSQL harness creates a fresh `compx574_recipe_create_003_*` database on the existing isolated server
+(localhost:55432, disposable mealie/mealie credentials); it refuses a nonempty database. SQLite uses a retained
+fresh directory. The script stops only its own temporary servers and never deletes databases or fixtures.
+`--production-validation` verifies the production 422 envelope; `--keep-serving` leaves the isolated stack available
+for UI review. Default isolated ports are 9400/9410/9480/9490 and can all be moved with `--port-offset`.
+
+## Recipe last-made updates
+
+`PATCH /api/recipes/{slug}/last-made` accepts a slug or recipe ID and a required `timestamp`. Java validates the
+body, authenticates the caller, writes the shared tables through MyBatis, and returns the full recipe DTO. Dates
+without a timezone use UTC; ISO offsets and numeric second/millisecond timestamps follow the current Python
+validator, including microsecond precision and its historical negative-float behavior. Both development and
+production validation envelopes are preserved.
+
+The caller can update a locked recipe or a recipe in another household of the same group. Other-group recipes
+remain inaccessible, including for administrators. Only the caller's `households_to_recipes` record changes.
+The recipe's overall `last_made` only advances; lowering a household date does not lower the recipe date.
+An identical household timestamp preserves that association's ID and timestamps. The update does not create a
+timeline event, change `date_updated`, or edit any recipe content. PostgreSQL retains Python's `500 DataError`
+for the unsupported raw `urn:uuid:` spelling; canonical and compact recipe IDs work on both engines.
+
+After the database transaction commits, Java sends signed event metadata to the approved event-only adapter's
+`/internal/recipe-updated` route. The adapter verifies the actor's group and recipe ownership and delivers the
+existing `recipe_updated` event to the **recipe owner's household**, including when another household made the
+update. All existing Apprise destinations, subscription options, integration metadata and translations remain
+in the original event bus. The adapter performs no recipe, household-association or timeline writes. Creation
+continues to use `/internal/recipe-created` unchanged.
+
+The same `RECIPE_EVENT_ADAPTER_KEY` is required in both backends. Java derives the update URL as the sibling of
+`RECIPE_EVENT_ADAPTER_URL`; set `RECIPE_UPDATE_EVENT_ADAPTER_URL` to override it. The gateway blocks `/internal/*`.
+Notification delivery is asynchronous and best effort, matching Python background delivery. Inspect
+`JAVA_RECIPE_LAST_MADE_UPDATED`, `RECIPE_UPDATED_EVENT_ACCEPTED` and `RECIPE_UPDATED_EVENT_ADAPTER` in the logs.
+
+After building, run the isolated HTTP comparisons with an explicit artifact (the harness refuses an occupied
+port or a nonempty fixture database):
+
+```bash
+uv run --frozen python dev/rebuild/recipe_last_made_parity.py --engine sqlite --jar /path/to/backend.jar --gateway /path/to/caddy --report /tmp/last-made-sqlite.json
+uv run --frozen python dev/rebuild/recipe_last_made_parity.py --engine postgres --port-offset 200 --jar /path/to/backend.jar --gateway /path/to/caddy --report /tmp/last-made-postgres.json
+# Add --production-validation for production 422 envelopes, or --keep-serving for isolated UI review.
+```
+
+The harness creates and retains disposable databases (`/tmp/compx574-recipe-last-made-004-*` or a unique
+`compx574_recipe_last_made_004_*` PostgreSQL database on localhost:55432). It uses ports 10400/10410/10480/10490
+plus the supplied offset and stops only its own services, unless retained for review. It never deletes fixtures,
+uses the normal development database, or runs destructive cleanup. Reports contain actual responses, stored
+state, notifications, failures, artifact hashes and service commands. Native updates and notifications must still
+work directly and through the gateway after only Python's matching PATCH is disabled. Creation, detail, listing,
+pagination, last-made filters and unmigrated route boundaries are checked in the same fixture stack.

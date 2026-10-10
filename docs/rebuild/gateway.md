@@ -2,7 +2,8 @@
 
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
 **:8080** sits in front of both and decides, per path, which backend answers. Public `GET /api/app/about`, authenticated
-`GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID) go to Java; all other application routes go to Python.
+`GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID), and exact manual `POST /api/recipes`
+go to Java. Local password login and user/group self reads also use Java as configured in the routing table. Other recipe writes and imports remain on Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐
@@ -179,3 +180,37 @@ GET responses should contain `X-Mealie-Backend: java`; filter-option APIs, login
 The card list loads 32 recipes per page. With fewer recipes, inspect pagination using the same listing request
 with `perPage=2` in the browser's request editor or DevTools; follow next/previous by adding /api to their paths.
 Do not populate the shared development database just to exercise pagination.
+
+## Manual creation and event delivery
+
+The creation matcher is method POST plus exact path `/api/recipes`. It does not cover `/api/recipes/`, imports,
+duplication, editing or deletion. A trailing-slash request keeps Python's redirect behavior before reaching the exact
+Java route. Creation itself is entirely Java/MyBatis, including defaults and its timeline entry.
+
+The approved notification adapter is a direct backend call, not a gateway route. `/internal/*` returns 404 at the
+gateway; the Python adapter additionally requires a dedicated HMAC signature. Set `RECIPE_EVENT_ADAPTER_KEY` in
+both backend environments and `RECIPE_EVENT_ADAPTER_URL` in Java (default
+`http://localhost:9000/internal/recipe-created`). See `backend-java/README.md` for key setup and isolated tests.
+`X-Mealie-Backend: java`, `JAVA_RECIPE_CREATED` and adapter/event-delivery logs distinguish native creation from
+the retained notification delivery dependency. No frontend or database schema changes are needed.
+
+## Recipe last-made routing
+
+The `@recipeLastMade` matcher selects only method PATCH and
+`^/api/recipes/[^/]+/last-made$`. Other recipe writes, imports, timeline APIs, other methods and trailing-slash
+redirects continue to use Python. The existing detail GET, listing GET and exact creation POST keep their Java
+matchers. To roll back only last-made, remove this matcher and its reverse proxy.
+
+Use `dev/rebuild/recipe_last_made_parity.py` with a built Java artifact and Caddy for isolated SQLite and PostgreSQL
+comparisons. See the [Java last-made instructions](../../backend-java/README.md#recipe-last-made-updates).
+`X-Mealie-Backend: java` and `JAVA_RECIPE_LAST_MADE_UPDATED` identify the native write. The approved signed,
+internal `/internal/recipe-updated` adapter only delivers update notifications and remains hidden by the gateway.
+Java derives its URL from the creation adapter URL, with `RECIPE_UPDATE_EVENT_ADAPTER_URL` as an optional override.
+
+In the unchanged UI, open a recipe and choose **I Made This!** in the **Last Made** area. Select a date later than
+its current value and submit. The frontend first creates a timeline event through Python, then sends the last-made
+PATCH to Java. That timeline event is a separate existing UI action; the PATCH itself does not create one.
+In browser Network, verify that PATCH returns 200 with the full recipe and `X-Mealie-Backend: java`, while the
+timeline POST has `X-Mealie-Backend: python`. Refresh the recipe, then use Recipe Finder's **Last Made** filter to
+check the caller household's date. An older date does not reduce the recipe's overall maximum, and the frontend
+only issues the PATCH when the selected date advances the displayed date.

@@ -1,0 +1,170 @@
+{
+  "af-ZA": {
+    "ingredientNote": "1 Cup Flour",
+    "instructionText": "Recipe steps as well as other fields in the recipe page support markdown syntax.\n\n**Add a link**\n\n[My Link](https://demo.mealie.io)\n"
+  },
+  "ar-SA": {
+    "ingredientNote": "كوب 1 طحين",
+    "instructionText": "تدعم خطوات الوصفة بالإضافة إلى الحقول الأخرى في صفحة الوصفة صياغة تخفيض السعر. **أضف رابطًا** [الرابط الخاص بي](https://demo.mealie.io)\n"
+  },
+  "bg-BG": {
+    "ingredientNote": "1 чаша брашно",
+    "instructionText": "Стъпките на рецептата, както и други полета в страницата с рецепти поддържат синтаксис за маркиране.\n\n **Добавяне на връзка**\n\n [Моята връзка](https://demo.mealie.io)\n"
+  },
+  "ca-ES": {
+    "ingredientNote": "1 tassa de farina",
+    "instructionText": "Passos de recepta i altres camps són compatibles amb sintaxi markdown.\n\n**Afegir un enllaç**\n\n[El meu enllaç](https://demo.mealie.io)\n"
+  },
+  "cs-CZ": {
+    "ingredientNote": "1 hrnek mouky",
+    "instructionText": "Kroky receptu stejně jako další pole v receptu podporují syntaxi markdown.\n\n**Přidat odkaz**\n\n[Můj odkaz](https://demo.mealie.io)\n"
+  },
+  "da-DK": {
+    "ingredientNote": "1 kop mel",
+    "instructionText": "Du kan bruge markdown-kode i beskrivelser og andre felter i opskrifter.\n\n**Tilføj et link**\n\n[Mit link](https://demo.mealie.io)\n"
+  },
+  "de-DE": {
+    "ingredientNote": "250 g Mehl",
+    "instructionText": "Zubereitungs-Schritte und andere Felder der Rezeptseite unterstützen Markdown Syntax.\n\n**Füge einen Link hinzu**\n\n[Mein Link](https://demo.mealie.io)\n"
+  },
+  "el-GR": {
+    "ingredientNote": "1 Κούπα Αλεύρι",
+    "instructionText": "Βήματα συνταγής, καθώς και άλλα πεδία στη σύνταξη σήμανσης της σελίδας συνταγής.\n\n**Προσθήκη συνδέσμου**\n\n[Ο σύνδεσμος μου](https://demo.mealie.io)\n"
+  },
+  "en-GB": {
+    "ingredientNote": "1 Cup Flour",
+    "instructionText": "Recipe steps as well as other fields in the recipe page support markdown syntax.\n\n**Add a link**\n\n[My Link](https://demo.mealie.io)\n"
+  },
+  "en-US": {
+    "ingredientNote": "1 Cup Flour",
+    "instructionText": "Recipe steps as well as other fields in the recipe page support markdown syntax.\n\n**Add a link**\n\n[My Link](https://demo.mealie.io)\n"
+  },
+  "es-ES": {
+    "ingredientNote": "1 Taza de harina",
+    "instructionText": "Los pasos de receta, así como otros campos en la página de recetas, soportan sintaxis Markdown.\n\n**Agregar un enlace**\n\n[Mi Enlace](https://demo.mealie.io)\n"
+  },
+  "et-EE": {
+    "ingredientNote": "1 tass jahu",
+    "instructionText": "Retsepti sammud nagu ka teised väljad retsepti lehed toetavad Markdown-i süntaksit\n\n** Lisa link **\n[Minu link](https://demo.mealie.io)"
+  },
+  "fi-FI": {
+    "ingredientNote": "1 kupillinen jauhoja",
+    "instructionText": "Reseptin vaiheet sekä muut kentät reseptisivulla tukevat markdown-syntaksia.\n\n**Lisää linkki**\n\n[Oma linkki](https://demo.mealie.io)\n"
+  },
+  "fr-BE": {
+    "ingredientNote": "100 g de farine",
+    "instructionText": "Les étapes de la recette ainsi que les autres champs de la page de recette supportent la syntaxe markdown.\n\n**Ajouter un lien**\n\n[Mon lien](https://demo.mealie.io)\n"
+  },
+  "fr-CA": {
+    "ingredientNote": "1 tasse de Farine",
+    "instructionText": "Les étapes de la recette ainsi que les autres champs de la page de recette supportent la syntaxe markdown.\n\n**Ajouter un lien**\n\n[Mon lien](https://demo.mealie.io)\n"
+  },
+  "fr-FR": {
+    "ingredientNote": "1 Tasse de farine",
+    "instructionText": "Les étapes de la recette ainsi que les autres champs de la page de recette supportent la syntaxe Markdown.\n\n**Ajouter un lien**\n\n[Mon lien](https://demo.mealie.io)\n"
+  },
+  "gl-ES": {
+    "ingredientNote": "1 Cunca de Fariña",
+    "instructionText": "Os pasos da receita, como outros campos na páxina da receita, suportan a sintaxe markdown.\n\n**Adicionar un link**\n\n[Meu link](https://demo.mealie.io)\n"
+  },
+  "he-IL": {
+    "ingredientNote": "כוס קמח",
+    "instructionText": "שלבי המתכון, כמו גם שדות אחרים בעמוד המתכון, תומכים בתחביר markdown.\n\n**הוספת קישור**\n\n[הקישור שלי](https://demo.mealie.io)\n"
+  },
+  "hr-HR": {
+    "ingredientNote": "1 šalica brašna",
+    "instructionText": "Koraci u receptu, kao i druga polja u receptu podržavaju markdown.\n\n**Dodaj poveznicu**\n\n[Poveznica](https://demo.mealie.io)\n"
+  },
+  "hu-HU": {
+    "ingredientNote": "1 csésze liszt",
+    "instructionText": "A recept lépései és a receptoldal egyéb mezői támogatják a markdown szintaxist.\n\n**Hivatkozás hozzáadása**\n\n[Saját link](https://demo.mealie.io)\n"
+  },
+  "is-IS": {
+    "ingredientNote": "1 bolli hveiti",
+    "instructionText": "Hægt er að nota markdown málskipan (syntax) í uppskriftinni og öðrum reitum.\n\n**Bæta við tengli**\n\n[Minn tengill](https://demo.mealie.io)\n"
+  },
+  "it-IT": {
+    "ingredientNote": "1 Tazza Di Farina",
+    "instructionText": "I passaggi della ricetta e altri campi nella pagina delle ricette supportano la sintassi markdown.\n\n**Aggiungi un link**\n\n[Il mio Link](https://demo.mealie.io)\nrecipe.recipe-defaults.step-text"
+  },
+  "ja-JP": {
+    "ingredientNote": "小麦粉1カップ",
+    "instructionText": "レシピの手順など、レシピページはmarkdown構文に対応しています\n\n例）\n[ミーリー](https://demo.mealie.io)\n"
+  },
+  "ko-KR": {
+    "ingredientNote": "밀가루 1컵",
+    "instructionText": "Recipe 단계는 물론 recipe 페이지의 다른 필드도 Markdown 문법을 지원합니다.\n\n**Add a link**\n\n[나의 링크](https://demo.mealie.io)\n"
+  },
+  "lt-LT": {
+    "ingredientNote": "1 Cup Flour",
+    "instructionText": "Recipe steps as well as other fields in the recipe page support markdown syntax.\n\n**Add a link**\n\n[My Link](https://demo.mealie.io)\n"
+  },
+  "lv-LV": {
+    "ingredientNote": "1 gl. Milti",
+    "instructionText": "Receptes darbības, kā arī citi lauki receptes lapā atbalsta atzīmes sintaksi.\n\n**Pievienot saiti**\n\n[Mana saite](https://demo.mealie.io)\n"
+  },
+  "nl-NL": {
+    "ingredientNote": "250 gram bloem",
+    "instructionText": "Receptstappen en andere velden op de receptpagina ondersteunen Markdown syntaxis.\n\n**Voeg een link toe**\n\n[Mijn Link](https://demo.mealie.io)\n"
+  },
+  "no-NO": {
+    "ingredientNote": "1 kopp mel",
+    "instructionText": "Steg i oppskrifter og andre felter på siden støtter markdown syntax.\n\n**Legg til en link**\n\n[Min link](https://demo.mealie.io)\n"
+  },
+  "pl-PL": {
+    "ingredientNote": "1 szklanka mąki",
+    "instructionText": "Kroki przepisu, jak również inne pola na stronie przepisu obsługują składnię markdown.\n\n**Dodaj link**\n\n[Mój link](https://demo.mealie.io)\n"
+  },
+  "pt-BR": {
+    "ingredientNote": "1 Xícara de Farinha",
+    "instructionText": "Passos das receitas, assim como outros campos na página da receita, suportam sintaxe \"markdown\".\n\n**Adicione um link**\n\n[Meu Link](https://demo.mealie.io)\n"
+  },
+  "pt-PT": {
+    "ingredientNote": "1 Chávena de Farinha",
+    "instructionText": "Os passos da receita, bem como outros campos na página da receita, suportam a sintaxe markdown.\n\n**Adicionar um link**\n\n[Meu link](https://demo.mealie.io)\n"
+  },
+  "ro-RO": {
+    "ingredientNote": "1 Cană de Făină",
+    "instructionText": "Pașii rețetei precum și alte domenii din sintaxa markdown de pe pagina de rețetă.\n\n**Adăugați un link**\n\n[Link-ul meu](https://demo.mealie.io)\n"
+  },
+  "ru-RU": {
+    "ingredientNote": "1 чашка муки",
+    "instructionText": "Шаги рецепта и прочие поля на странице рецепта поддерживают синтаксис Markdown.\n\n**Добавить ссылку**\n\n[Моя ссылка](https://demo.mealie.io)\n"
+  },
+  "sk-SK": {
+    "ingredientNote": "1 šálka múky",
+    "instructionText": "Postup receptu, ako aj ďalšie polia na stránke receptu podporujú markdown syntax.\n\n**Pridanie odkazu**\n\n[Môj odkaz](https://demo.mealie.io)\n"
+  },
+  "sl-SI": {
+    "ingredientNote": "skodelica moke",
+    "instructionText": "Postopek priprave recepta, kot tudi druga polja v receptu podpirajo markdown sintakso.\n\n**Dodaj povezavo**\n\n[Moja povezava](https://demo.mealie.io)\n"
+  },
+  "sr-SP": {
+    "ingredientNote": "1 шоља брашна",
+    "instructionText": "Упутство за рецепт као и остала поља подржавају markdown синтаксу\n\n**Додати линк**\n\n[Мој линк](https://demo.mealie.io)\n"
+  },
+  "sv-SE": {
+    "ingredientNote": "1 kopp mjöl",
+    "instructionText": "Receptsteg samt andra fält i receptsidan stöder markdown syntax.\n\n**Lägg till en länk**\n\n[Min länk](https://demo.mealie.io)\n"
+  },
+  "tr-TR": {
+    "ingredientNote": "1 Bardak Un",
+    "instructionText": "Tarif sayfasındaki tarif adımlarının yanı sıra diğer alanlar da markdown destekler.\n\n**Bağlantı ekle**\n\n[Bağlantım](https://demo.mealie.io)\n"
+  },
+  "uk-UA": {
+    "ingredientNote": "Стакан борошна",
+    "instructionText": "Кроки рецептів, так само як і інші поля сторінки, підтримують синтаксис markdown.\n\n**Додати посилання**\n\n[Моє посилання](https://demo.mealie.io)\n"
+  },
+  "vi-VN": {
+    "ingredientNote": "1 Cup Flour",
+    "instructionText": "Recipe steps as well as other fields in the recipe page support markdown syntax.\n\n**Add a link**\n\n[My Link](https://demo.mealie.io)\n"
+  },
+  "zh-CN": {
+    "ingredientNote": "1杯面粉",
+    "instructionText": "食谱步骤以及食谱页面的其他字段支持markdown语法。\n\n**添加一个链接**\n\n[我的链接](https://demo.mealie.io)\n"
+  },
+  "zh-TW": {
+    "ingredientNote": "1 杯麵粉",
+    "instructionText": "食譜步驟以及食譜頁面中的其他欄位皆支援 Markdown 語法。\n\n**新增連結**\n\n[我的連結](https://demo.mealie.io)\n"
+  }
+}
