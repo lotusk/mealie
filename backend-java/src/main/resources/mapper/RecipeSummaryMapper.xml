@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.RecipeSummaryMapper">
+
+    <resultMap id="userHouseholdRow" type="io.mealie.backend.persistence.model.UserHouseholdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="household_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <!-- RecipeSummary.household_id is an association proxy through the recipe's user. -->
+    <select id="userHouseholds" resultMap="userHouseholdRow">
+        SELECT users.id, users.household_id FROM users
+        WHERE users.id IN
+        <foreach collection="userIds" item="userId" open="(" separator=", " close=")">#{userId, javaType=java.lang.Object}</foreach>
+    </select>
+
+    <!-- Lazy load of Tool.households_with_tool; RecipeTool lists the households' slugs. -->
+    <select id="toolHouseholdSlugs" resultType="java.lang.String">
+        SELECT households.slug
+        FROM households, households_to_tools
+        WHERE #{toolId} = households_to_tools.tool_id AND households.id = households_to_tools.household_id
+    </select>
+
+    <!-- MealieModel.filter_search_query() sets this before a fuzzy (pg_trgm) search. -->
+    <select id="setWordSimilarityThreshold" resultType="java.lang.String">
+        SELECT set_config('pg_trgm.word_similarity_threshold', #{threshold}, false)
+    </select>
+</mapper>

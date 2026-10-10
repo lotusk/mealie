@@ -47,7 +47,7 @@ public class AuthService {
             // Python raises a bare HTTPException(401) on this path, so there is no WWW-Authenticate header.
             return parseUuid(jwt.getClaim("id").asString())
                     .flatMap(userId -> users.findByApiToken(token, userId))
-                    .map(UserAuthRecord::user)
+                    .map(record -> record.user().withIntegrationId(integrationId(jwt)))
                     .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED));
         }
 
@@ -58,7 +58,13 @@ public class AuthService {
         if (record.tokensValidAfter() != null && issuedBefore(jwt, record.tokensValidAfter())) {
             throw credentialsException();
         }
-        return record.user();
+        return record.user().withIntegrationId(integrationId(jwt));
+    }
+
+    /** get_integration_id(): the token's integration_id claim, or "generic". */
+    private static String integrationId(DecodedJWT jwt) {
+        String value = jwt.getClaim("integration_id").asString();
+        return value != null ? value : AuthUser.DEFAULT_INTEGRATION_ID;
     }
 
     private DecodedJWT verify(String token) {

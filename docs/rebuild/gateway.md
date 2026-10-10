@@ -108,6 +108,8 @@ To roll back, delete the line.
 
 Gotchas:
 
+- `/api/internal/*` is for backend-to-backend calls (the Java backend publishes events through Python there). The
+  gateway answers it with a 404; keep that rule above any route you add.
 - `/api/foods*` is a plain string prefix. It also catches `/api/foodsearch`, if such a route existed. Use
   `/api/foods/*` to match only below the segment. To keep one sub-path on Python, add a longer rule pointing at
   `{$PYTHON_UPSTREAM}`.
@@ -145,6 +147,10 @@ databases, pass `--token` (or `MEALIE_TOKEN`) or `--username/--password`. The to
 engine check can read `/api/admin/about`.
 
 Only add **read-only** cases. Both backends write to the same database, so a POST in a case runs twice.
+
+Write endpoints need a scenario script instead: it runs the same steps against each backend on separate data and
+compares the normalized responses. Tags have one (`task diff:tags-writes`, `dev/rebuild/write_diff_tags.py`), which
+covers creating, updating, merging and deleting, plus permission and validation errors.
 
 ## Checking the Java SQL dialect against a real database
 

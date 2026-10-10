@@ -14,6 +14,336 @@
       "path": "/api/app/about"
     },
     {
+      "name": "tags: default list",
+      "method": "GET",
+      "path": "/api/organizers/tags"
+    },
+    {
+      "name": "tags: all, by name",
+      "method": "GET",
+      "path": "/api/organizers/tags?perPage=-1&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "tags: page 2 of 1",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=2&perPage=1&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "tags: last page",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=-1&perPage=2"
+    },
+    {
+      "name": "tags: page 0",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=0&perPage=2"
+    },
+    {
+      "name": "tags: perPage 0",
+      "method": "GET",
+      "path": "/api/organizers/tags?perPage=0"
+    },
+    {
+      "name": "tags: perPage -2",
+      "method": "GET",
+      "path": "/api/organizers/tags?perPage=-2"
+    },
+    {
+      "name": "tags: page past end",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=9&perPage=2"
+    },
+    {
+      "name": "tags: duplicate params, last wins",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=2&page=1&perPage=1"
+    },
+    {
+      "name": "tags: int forms",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=%201%20&perPage=1.0"
+    },
+    {
+      "name": "tags: multi order, nulls",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=name%3Aasc%2Cslug%3Adesc&orderByNullPosition=last"
+    },
+    {
+      "name": "tags: order by updatedAt",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=updatedAt&orderDirection=asc"
+    },
+    {
+      "name": "tags: order by recipe name",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=recipes.name&orderDirection=asc"
+    },
+    {
+      "name": "tags: order by group",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=group.name"
+    },
+    {
+      "name": "tags: random",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=random&paginationSeed=abc&perPage=-1"
+    },
+    {
+      "name": "tags: random other seed",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=random&paginationSeed=seed+2&perPage=2&page=2"
+    },
+    {
+      "name": "tags: random w/o seed",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=random"
+    },
+    {
+      "name": "tags: empty orderBy",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy="
+    },
+    {
+      "name": "tags: search",
+      "method": "GET",
+      "path": "/api/organizers/tags?search=des"
+    },
+    {
+      "name": "tags: search words",
+      "method": "GET",
+      "path": "/api/organizers/tags?search=spicy+cafe"
+    },
+    {
+      "name": "tags: search quoted",
+      "method": "GET",
+      "path": "/api/organizers/tags?search=%22Spicy+Food%22"
+    },
+    {
+      "name": "tags: search punctuation only",
+      "method": "GET",
+      "path": "/api/organizers/tags?search=%21%21%21"
+    },
+    {
+      "name": "tags: search + order",
+      "method": "GET",
+      "path": "/api/organizers/tags?search=e&orderBy=name"
+    },
+    {
+      "name": "tags: filter like",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+LIKE+%22%25ess%25%22"
+    },
+    {
+      "name": "tags: filter not like",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+NOT+LIKE+%22%25ess%25%22"
+    },
+    {
+      "name": "tags: filter in",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=slug+IN+%5Bdesserts%2C+spicy-food%5D&orderBy=slug"
+    },
+    {
+      "name": "tags: filter not in",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=slug+NOT+IN+%5Bdesserts%5D"
+    },
+    {
+      "name": "tags: filter eq case",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+%3D+%22DESSERTS%22"
+    },
+    {
+      "name": "tags: filter and/or",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+%3D+desserts+OR+slug+%3D+spicy-food+AND+name+%3C%3E+x"
+    },
+    {
+      "name": "tags: filter groups",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=%28name+%3D+desserts+OR+slug+%3D+spicy-food%29+AND+createdAt+%3E+2020-01-01"
+    },
+    {
+      "name": "tags: filter now",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=createdAt+%3C+%24NOW%2B1d"
+    },
+    {
+      "name": "tags: filter recipes is null",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.name+IS+NULL"
+    },
+    {
+      "name": "tags: filter recipes like",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.name+LIKE+%22%25cake%25%22"
+    },
+    {
+      "name": "tags: filter recipes contains all",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.slug+CONTAINS+ALL+%5Bchocolate-cake%2C+lemon-tart%5D"
+    },
+    {
+      "name": "tags: filter recipes not in",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.slug+NOT+IN+%5Blemon-tart%5D"
+    },
+    {
+      "name": "tags: filter group name",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=group.name+%3D+home"
+    },
+    {
+      "name": "tags: filter recipe user",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.user.username+%3D+changeme"
+    },
+    {
+      "name": "tags: filter recipe household proxy",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.householdId+IS+NOT+NULL"
+    },
+    {
+      "name": "tags: filter nested tags",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes.tags.slug+%3D+umlaut-cafe-bar"
+    },
+    {
+      "name": "tags: filter id",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=id+%3D+29bf7010-a6ba-4881-9607-9c57b83d41ea"
+    },
+    {
+      "name": "tags: filter trailing AND",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+%3D+x+AND"
+    },
+    {
+      "name": "err: unknown attr",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=foo+%3D+1"
+    },
+    {
+      "name": "err: relationship attr",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipes+%3D+1"
+    },
+    {
+      "name": "err: non-filterable",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=recipeCount+%3D+1"
+    },
+    {
+      "name": "err: unbalanced",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=%28name+%3D+x"
+    },
+    {
+      "name": "err: IN without list",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+IN+x"
+    },
+    {
+      "name": "err: IS not null",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+IS+x"
+    },
+    {
+      "name": "err: like on uuid",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=id+LIKE+%22x%22"
+    },
+    {
+      "name": "err: bad uuid",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=id+%3D+nope"
+    },
+    {
+      "name": "err: bad date",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=createdAt+%3E+notadate"
+    },
+    {
+      "name": "err: bad now",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=createdAt+%3E+%24NOW%2B5x"
+    },
+    {
+      "name": "err: dangling op",
+      "method": "GET",
+      "path": "/api/organizers/tags?queryFilter=name+%3D"
+    },
+    {
+      "name": "err: bad orderBy",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=foo"
+    },
+    {
+      "name": "err: orderBy relationship",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=recipes"
+    },
+    {
+      "name": "err: orderBy bad dir",
+      "method": "GET",
+      "path": "/api/organizers/tags?orderBy=name%3Aup"
+    },
+    {
+      "name": "err: 422 query",
+      "method": "GET",
+      "path": "/api/organizers/tags?page=abc&perPage=x&orderDirection=up&orderByNullPosition=mid"
+    },
+    {
+      "name": "tags: empty",
+      "method": "GET",
+      "path": "/api/organizers/tags/empty"
+    },
+    {
+      "name": "tags: by id",
+      "method": "GET",
+      "path": "/api/organizers/tags/29bf7010-a6ba-4881-9607-9c57b83d41ea"
+    },
+    {
+      "name": "err: id not found",
+      "method": "GET",
+      "path": "/api/organizers/tags/a1b2c3d4-0000-4000-8000-000000000000"
+    },
+    {
+      "name": "err: id invalid",
+      "method": "GET",
+      "path": "/api/organizers/tags/notauuid"
+    },
+    {
+      "name": "err: id short",
+      "method": "GET",
+      "path": "/api/organizers/tags/bad"
+    },
+    {
+      "name": "err: id v1",
+      "method": "GET",
+      "path": "/api/organizers/tags/29bf7010-a6ba-1881-9607-9c57b83d41ea"
+    },
+    {
+      "name": "tags: by slug",
+      "method": "GET",
+      "path": "/api/organizers/tags/slug/desserts"
+    },
+    {
+      "name": "tags: by slug 2",
+      "method": "GET",
+      "path": "/api/organizers/tags/slug/umlaut-cafe-bar"
+    },
+    {
+      "name": "err: slug missing",
+      "method": "GET",
+      "path": "/api/organizers/tags/slug/nope"
+    },
+    {
+      "name": "err: GET merge",
+      "method": "GET",
+      "path": "/api/organizers/tags/merge"
+    },
+    {
       "name": "public app theme",
       "method": "GET",
       "path": "/api/app/about/theme"

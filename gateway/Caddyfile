@@ -34,6 +34,9 @@
 	# for it that points at {$PYTHON_UPSTREAM}.
 	# ---------------------------------------------------------------------------------------------
 
+	# Backend-to-backend only: the Java backend publishes events through Python here (signed, but never exposed).
+	respond /api/internal/* 404
+
 	reverse_proxy /api/app/about {$JAVA_UPSTREAM}
 	reverse_proxy /api/app/about/theme {$JAVA_UPSTREAM}
 	reverse_proxy /api/app/about/startup-info {$JAVA_UPSTREAM}
@@ -88,5 +91,6 @@
 	}
 	reverse_proxy @recipeList {$JAVA_UPSTREAM}
 	reverse_proxy @recipeGet {$JAVA_UPSTREAM}
+	reverse_proxy /api/organizers/tags* {$JAVA_UPSTREAM}
 	reverse_proxy {$PYTHON_UPSTREAM}
 }
