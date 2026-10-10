@@ -8,6 +8,14 @@ on Python. `POST /api/auth/token` now uses Java for local Mealie password login.
 `GET /api/users/self` also uses Java; its sibling ratings/favorites routes and user writes remain on Python.
 Authenticated `GET /api/groups/self` uses Java too; group preferences and AI-provider summaries are read from the
 shared database without returning provider API keys. Other group routes remain on Python.
+`GET /api/organizers/tools` is also served by Java, including pagination, search, query filters, recipe counts and
+household slugs. Tool writes and tool detail/empty/merge routes remain on Python. After pulling new Java routes,
+restart `task java` to register them; the gateway watches its Caddyfile automatically.
+
+After `task java:package`, compare tools listing against Python with a fresh temporary SQLite database:
+`uv run --frozen python dev/rebuild/tool_list_parity.py --report /tmp/tools-parity.json`.
+Add `--gateway /path/to/caddy` to also verify the gateway's GET-only routing. The script stops its temporary
+servers on completion and never uses the development database.
 
 The password login shares Python's user table, failed-attempt lockout, HS256 secret, token lifetime, and session
 cookie format. LDAP authentication still runs in Python: for LDAP deployments, start the gateway with

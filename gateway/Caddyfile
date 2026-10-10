@@ -75,5 +75,10 @@
 	reverse_proxy @recipeList {$JAVA_UPSTREAM}
 	reverse_proxy @recipeGet {$JAVA_UPSTREAM}
 	reverse_proxy /api/organizers/tags* {$JAVA_UPSTREAM}
+	@toolList {
+		method GET
+		path /api/organizers/tools
+	}
+	reverse_proxy @toolList {$JAVA_UPSTREAM}
 	reverse_proxy {$PYTHON_UPSTREAM}
 }
