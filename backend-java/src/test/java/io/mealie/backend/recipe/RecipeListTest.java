@@ -22,7 +22,7 @@ class RecipeListTest {
     private static final UUID USER = UUID.fromString("00000000-0000-4000-8000-000000000002");
     private static final UUID HOME = UUID.fromString("00000000-0000-4000-8000-000000000003");
     private final SqlDialect dialect = SqlDialect.forEngine(DbEngine.SQLITE);
-    private final AuthUser user = new AuthUser(USER, "tester", GROUP, HOME, false);
+    private final AuthUser user = new AuthUser(USER, "tester", GROUP, HOME, false, false, AuthUser.DEFAULT_INTEGRATION_ID);
     private NamedParameterJdbcTemplate jdbc;
 
     @BeforeEach

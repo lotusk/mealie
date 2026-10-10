@@ -471,3 +471,8 @@ tasks:
     desc: sends the same requests to Python (:9000) and Java (:9100) and compares the JSON (args after '--')
     cmds:
       - uv run python dev/rebuild/diff_test.py {{ .CLI_ARGS }}
+
+  diff:tags-writes:
+    desc: runs the tag write scenario (create/update/merge/delete) on Python and Java and compares every response
+    cmds:
+      - uv run python dev/rebuild/write_diff_tags.py {{ .CLI_ARGS }}
