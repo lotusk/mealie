@@ -1,7 +1,8 @@
 # Migration gateway
 
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
-**:8080** sits in front of both and decides, per path, which backend answers. Only authenticated `GET /api/recipes/{slug}` (slug or UUID) goes to Java; all other application routes go to Python.
+**:8080** sits in front of both and decides, per path, which backend answers. Authenticated `GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID) go to Java;
+all other application routes go to Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐
@@ -153,10 +154,22 @@ and `task java:test:db ENGINE=postgres` also check the dialect read-only against
 ## Recipe GET routing
 
 The `@recipeGet` matcher combines method GET with exactly one segment below `/api/recipes/` and excludes
-the fixed `suggestions` and `exports` routes. Listing, nested routes, creation, edits, imports, login,
+the fixed `suggestions` and `exports` routes. The separate `@recipeList` matcher selects only exact GET /api/recipes.
+Nested routes, creation, edits, deletion, imports, login,
 HEAD and OPTIONS stay on Python. To roll back this endpoint, remove its matcher and corresponding reverse proxy.
 
 Run `dev/rebuild/recipe_get_parity.py` with `--gateway /path/to/caddy` for the actual matcher and both upstreams
 on isolated ports. The matrix covers slug/UUID reads, nested response data, authentication, group/household access,
 locale-dependent displays, unmigrated route boundaries and reads with Python stopped. See
 [Java backend instructions](../../backend-java/README.md#single-recipe-reads) for both database engines.
+
+Run `dev/rebuild/recipe_list_parity.py --gateway /path/to/caddy --report /tmp/list.json` for listing and
+detail regression checks through the actual gateway configuration, using disposable databases. See the
+[listing test instructions](../../backend-java/README.md#recipe-listing) for SQLite and PostgreSQL.
+
+In the UI, open the group home or Recipe Finder at `/g/home/recipes/finder`, search an existing recipe, change
+sorting, and select categories/tags/foods/tools/households or Other Filters. In browser Network, listing and detail
+GET responses should contain `X-Mealie-Backend: java`; filter-option APIs, login and write endpoints remain Python.
+The card list loads 32 recipes per page. With fewer recipes, inspect pagination using the same listing request
+with `perPage=2` in the browser's request editor or DevTools; follow next/previous by adding /api to their paths.
+Do not populate the shared development database just to exercise pagination.

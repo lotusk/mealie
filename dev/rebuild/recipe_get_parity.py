@@ -459,8 +459,8 @@ def main() -> None:
             expected=200,
         )
         if args.gateway:
+            # Listing is migrated too; its parity and routing are covered by recipe_list_parity.py.
             for method, path in [
-                ("GET", "/api/recipes"),
                 ("GET", "/api/recipes/suggestions"),
                 ("GET", "/api/recipes/exports"),
                 ("GET", "/api/recipes/" + rich["slug"] + "/comments"),

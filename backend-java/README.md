@@ -2,8 +2,8 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). The authenticated `GET /api/recipes/{slug}` now runs here, accepting a recipe slug or UUID. Other application
-endpoints remain on Python.
+(`JAVA_API_PORT`). Authenticated `GET /api/recipes` listing and `GET /api/recipes/{slug}` detail now run here. Detail accepts a recipe
+slug or UUID. Other application endpoints remain on Python.
 
 ```bash
 task java           # run against the same database as `task py`
@@ -90,3 +90,45 @@ For PostgreSQL, provide a fresh disposable database named `compx574_recipe_parit
 user/password `mealie`; the harness never uses the normal dev database. The SQLite database is temporary.
 The harness uses ports 9200/9210/9280, saves service logs beside its JSON report and stops its servers afterwards.
 With Caddy, it also verifies other routes still use Python and proves recipe reads work after Python is stopped.
+
+## Recipe listing
+
+`GET /api/recipes` uses the existing authentication resolver, a read-only service transaction and JDBC queries.
+It supports pagination (including -1 conventions), sorting/null positions, seeded random order, search, queryFilter,
+category/tag/tool/food/household filters, requireAll flags and cookbooks. SQLite uses token and quoted phrase search;
+PostgreSQL also uses the original pg_trgm operators with a transaction-local threshold. Food filters include
+ingredient substitutions. Filterable fields and relationship joins are whitelisted in
+`src/main/resources/recipe-list/schema.json`, copied from the existing Python SQLAlchemy metadata. Request values
+are bound parameters. Organizer summary reads are batched; full recipe ingredients are not loaded for listing.
+
+Listing remains group-scoped, including for administrators, and includes private households in the same group.
+User-specific rating/lastMade expressions apply to sorting and query filters; projected summary values remain the
+recipe's stored values, matching Python. Private attributes such as user.email/password remain unfilterable.
+
+The response keeps Python's snake-case pagination envelope, camel-case recipe summaries, +00:00 summary dates,
+and relative `/recipes?...` pagination links. The frontend already prefixes those links with /api. Unknown query
+parameters and the last value of repeated parameters are retained in links, as in Starlette.
+
+Build first, then run the disposable HTTP matrix:
+
+```bash
+task java:package
+uv run --frozen python dev/rebuild/recipe_list_parity.py --gateway /path/to/caddy --report /tmp/list-sqlite.json
+uv run --frozen python dev/rebuild/recipe_list_parity.py --engine postgres --postgres-database compx574_recipe_list_002_03 --gateway /path/to/caddy --report /tmp/list-postgres.json
+```
+
+PostgreSQL requires a newly created, empty database whose name is compx574_recipe_list_002 or begins with
+compx574_recipe_list_002_. The test server is localhost:55432, with disposable test credentials mealie/mealie.
+The harness refuses a non-experiment database name or a database that already has tables. SQLite uses a new
+temporary directory. All fixtures, including token revocation tests, are confined to these databases. Nothing is
+created or removed in the shared development database. Use --baseline-only to capture Python without starting Java.
+
+The harness records full raw responses, failures and service logs. Recipe item order is compared exactly; sort/search
+cases add the supported name secondary sort for tied values. Category/tag/tool associations have no declared Python
+ordering, so their complete values are compared without relying on incidental SQL order. Redirect paths are compared
+after removing each isolated server's origin. Tests also follow pagination links, check authentication and group
+access, exercise detail reads, verify unmigrated gateway boundaries and stop Python to prove Java independence.
+
+Search uses the unchanged text-unidecode 1.3 translation table from the Python dependency; the original Artistic
+Licence is included beside the table. This is data consumed by Java, with no Python process or HTTP forwarding.
+The table provenance and licence are documented in its resource directory.

@@ -17,6 +17,16 @@
       "name": "missing recipe ID",
       "method": "GET",
       "path": "/api/recipes/00000000-0000-4000-8000-000000000000"
+    },
+    {
+      "name": "recipe listing",
+      "method": "GET",
+      "path": "/api/recipes"
+    },
+    {
+      "name": "recipe listing pagination and sorting",
+      "method": "GET",
+      "path": "/api/recipes?perPage=2&orderBy=name&orderDirection=asc"
     }
   ]
 }

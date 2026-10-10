@@ -1,0 +1,5104 @@
+{
+  "source": "Python SQLAlchemy model whitelist at 525bf52b30d5015af7f0642b4285e3beaebd2942",
+  "root": "RecipeModel",
+  "models": {
+    "AIProvider": {
+      "table": "ai_providers",
+      "columns": {
+        "settings_id": {
+          "name": "settings_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProvider.settings_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProvider.name"
+        },
+        "base_url": {
+          "name": "base_url",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProvider.base_url"
+        },
+        "api_key": {
+          "name": "api_key",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProvider.api_key"
+        },
+        "model": {
+          "name": "model",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProvider.model"
+        },
+        "timeout": {
+          "name": "timeout",
+          "kind": "number",
+          "filterable": false,
+          "display": "AIProvider.timeout"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProvider.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProvider.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProvider.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProvider.updated_at"
+        }
+      },
+      "relations": {
+        "settings": {
+          "model": "AIProviderSettings",
+          "join": "{target}.id = {parent}.settings_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProvider.settings"
+        },
+        "request_headers": {
+          "model": "AIProviderHeaders",
+          "join": "{parent}.id = {target}.provider_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProvider.request_headers"
+        },
+        "request_params": {
+          "model": "AIProviderParams",
+          "join": "{parent}.id = {target}.provider_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProvider.request_params"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "settings",
+          "group_id"
+        ]
+      }
+    },
+    "AIProviderHeaders": {
+      "table": "ai_provider_headers",
+      "columns": {
+        "provider_id": {
+          "name": "provider_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderHeaders.provider_id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderHeaders.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderHeaders.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderHeaders.updated_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "AIProviderHeaders.id"
+        },
+        "key_name": {
+          "name": "key_name",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProviderHeaders.key_name"
+        },
+        "value": {
+          "name": "value",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProviderHeaders.value"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "AIProviderParams": {
+      "table": "ai_provider_params",
+      "columns": {
+        "provider_id": {
+          "name": "provider_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderParams.provider_id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderParams.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderParams.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderParams.updated_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "AIProviderParams.id"
+        },
+        "key_name": {
+          "name": "key_name",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProviderParams.key_name"
+        },
+        "value": {
+          "name": "value",
+          "kind": "string",
+          "filterable": false,
+          "display": "AIProviderParams.value"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "AIProviderSettings": {
+      "table": "ai_provider_settings",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderSettings.group_id"
+        },
+        "default_provider_id": {
+          "name": "default_provider_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderSettings.default_provider_id"
+        },
+        "audio_provider_id": {
+          "name": "audio_provider_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderSettings.audio_provider_id"
+        },
+        "image_provider_id": {
+          "name": "image_provider_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderSettings.image_provider_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "AIProviderSettings.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderSettings.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderSettings.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "AIProviderSettings.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProviderSettings.group"
+        },
+        "providers": {
+          "model": "AIProvider",
+          "join": "{parent}.id = {target}.settings_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProviderSettings.providers"
+        },
+        "default_provider": {
+          "model": "AIProvider",
+          "join": "{target}.id = {parent}.default_provider_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProviderSettings.default_provider"
+        },
+        "audio_provider": {
+          "model": "AIProvider",
+          "join": "{target}.id = {parent}.audio_provider_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProviderSettings.audio_provider"
+        },
+        "image_provider": {
+          "model": "AIProvider",
+          "join": "{target}.id = {parent}.image_provider_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "AIProviderSettings.image_provider"
+        }
+      },
+      "proxies": {}
+    },
+    "ApiExtras": {
+      "table": "api_extras",
+      "columns": {
+        "recipee_id": {
+          "name": "recipee_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ApiExtras.recipee_id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ApiExtras.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ApiExtras.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ApiExtras.updated_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "ApiExtras.id"
+        },
+        "key_name": {
+          "name": "key_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "ApiExtras.key_name"
+        },
+        "value": {
+          "name": "value",
+          "kind": "string",
+          "filterable": true,
+          "display": "ApiExtras.value"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "Category": {
+      "table": "categories",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Category.group_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "Category.name"
+        },
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "Category.slug"
+        },
+        "recipe_count": {
+          "name": "%(281473070779088 anon)s",
+          "kind": "number",
+          "filterable": false,
+          "display": "Category.recipe_count"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Category.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Category.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Category.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Category.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Category.group"
+        },
+        "recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {link}.category_id",
+          "secondary": "recipes_to_categories",
+          "secondaryJoin": "{target}.id = {link}.recipe_id",
+          "display": "Category.recipes"
+        }
+      },
+      "proxies": {}
+    },
+    "CookBook": {
+      "table": "cookbooks",
+      "columns": {
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": true,
+          "display": "CookBook.position"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "CookBook.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "CookBook.household_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "CookBook.name"
+        },
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "CookBook.slug"
+        },
+        "description": {
+          "name": "description",
+          "kind": "string",
+          "filterable": true,
+          "display": "CookBook.description"
+        },
+        "public": {
+          "name": "public",
+          "kind": "bool",
+          "filterable": true,
+          "display": "CookBook.public"
+        },
+        "query_filter_string": {
+          "name": "query_filter_string",
+          "kind": "string",
+          "filterable": false,
+          "display": "CookBook.query_filter_string"
+        },
+        "require_all_categories": {
+          "name": "require_all_categories",
+          "kind": "bool",
+          "filterable": true,
+          "display": "CookBook.require_all_categories"
+        },
+        "require_all_tags": {
+          "name": "require_all_tags",
+          "kind": "bool",
+          "filterable": true,
+          "display": "CookBook.require_all_tags"
+        },
+        "require_all_tools": {
+          "name": "require_all_tools",
+          "kind": "bool",
+          "filterable": true,
+          "display": "CookBook.require_all_tools"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "CookBook.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "CookBook.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "CookBook.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "CookBook.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "CookBook.group"
+        },
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "CookBook.household"
+        },
+        "categories": {
+          "model": "Category",
+          "join": "{parent}.id = {link}.cookbook_id",
+          "secondary": "cookbooks_to_categories",
+          "secondaryJoin": "{target}.id = {link}.category_id",
+          "display": "CookBook.categories"
+        },
+        "tags": {
+          "model": "Tag",
+          "join": "{parent}.id = {link}.cookbook_id",
+          "secondary": "cookbooks_to_tags",
+          "secondaryJoin": "{target}.id = {link}.tag_id",
+          "display": "CookBook.tags"
+        },
+        "tools": {
+          "model": "Tool",
+          "join": "{parent}.id = {link}.cookbook_id",
+          "secondary": "cookbooks_to_tools",
+          "secondaryJoin": "{target}.id = {link}.tool_id",
+          "display": "CookBook.tools"
+        }
+      },
+      "proxies": {}
+    },
+    "Group": {
+      "table": "groups",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "Group.name"
+        },
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "Group.slug"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Group.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Group.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Group.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Group.updated_at"
+        }
+      },
+      "relations": {
+        "households": {
+          "model": "Household",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.households"
+        },
+        "users": {
+          "model": "User",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.users"
+        },
+        "categories": {
+          "model": "Category",
+          "join": "{parent}.id = {link}.group_id",
+          "secondary": "group_to_categories",
+          "secondaryJoin": "{target}.id = {link}.category_id",
+          "display": "Group.categories"
+        },
+        "invite_tokens": {
+          "model": "GroupInviteToken",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.invite_tokens"
+        },
+        "preferences": {
+          "model": "GroupPreferencesModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.preferences"
+        },
+        "ai_provider_settings": {
+          "model": "AIProviderSettings",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.ai_provider_settings"
+        },
+        "recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.recipes"
+        },
+        "labels": {
+          "model": "MultiPurposeLabel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.labels"
+        },
+        "mealplans": {
+          "model": "GroupMealPlan",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.mealplans"
+        },
+        "webhooks": {
+          "model": "GroupWebhooksModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.webhooks"
+        },
+        "recipe_actions": {
+          "model": "GroupRecipeAction",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.recipe_actions"
+        },
+        "cookbooks": {
+          "model": "CookBook",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.cookbooks"
+        },
+        "server_tasks": {
+          "model": "ServerTaskModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.server_tasks"
+        },
+        "data_exports": {
+          "model": "GroupDataExportsModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.data_exports"
+        },
+        "shopping_lists": {
+          "model": "ShoppingList",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.shopping_lists"
+        },
+        "group_reports": {
+          "model": "ReportModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.group_reports"
+        },
+        "group_event_notifiers": {
+          "model": "GroupEventNotifierModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.group_event_notifiers"
+        },
+        "ingredient_units": {
+          "model": "IngredientUnitModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.ingredient_units"
+        },
+        "ingredient_foods": {
+          "model": "IngredientFoodModel",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.ingredient_foods"
+        },
+        "tools": {
+          "model": "Tool",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.tools"
+        },
+        "tags": {
+          "model": "Tag",
+          "join": "{parent}.id = {target}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Group.tags"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupDataExportsModel": {
+      "table": "group_data_exports",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupDataExportsModel.group_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupDataExportsModel.name"
+        },
+        "filename": {
+          "name": "filename",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupDataExportsModel.filename"
+        },
+        "path": {
+          "name": "path",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupDataExportsModel.path"
+        },
+        "size": {
+          "name": "size",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupDataExportsModel.size"
+        },
+        "expires": {
+          "name": "expires",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupDataExportsModel.expires"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupDataExportsModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupDataExportsModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupDataExportsModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupDataExportsModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupDataExportsModel.group"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupEventNotifierModel": {
+      "table": "group_events_notifiers",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupEventNotifierModel.name"
+        },
+        "enabled": {
+          "name": "enabled",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierModel.enabled"
+        },
+        "apprise_url": {
+          "name": "apprise_url",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupEventNotifierModel.apprise_url"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupEventNotifierModel.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupEventNotifierModel.household_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupEventNotifierModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupEventNotifierModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupEventNotifierModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupEventNotifierModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupEventNotifierModel.group"
+        },
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupEventNotifierModel.household"
+        },
+        "options": {
+          "model": "GroupEventNotifierOptionsModel",
+          "join": "{parent}.id = {target}.event_notifier_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupEventNotifierModel.options"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupEventNotifierOptionsModel": {
+      "table": "group_events_notifier_options",
+      "columns": {
+        "event_notifier_id": {
+          "name": "event_notifier_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.event_notifier_id"
+        },
+        "recipe_created": {
+          "name": "recipe_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.recipe_created"
+        },
+        "recipe_updated": {
+          "name": "recipe_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.recipe_updated"
+        },
+        "recipe_deleted": {
+          "name": "recipe_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.recipe_deleted"
+        },
+        "user_signup": {
+          "name": "user_signup",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.user_signup"
+        },
+        "data_migrations": {
+          "name": "data_migrations",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.data_migrations"
+        },
+        "data_export": {
+          "name": "data_export",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.data_export"
+        },
+        "data_import": {
+          "name": "data_import",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.data_import"
+        },
+        "mealplan_entry_created": {
+          "name": "mealplan_entry_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.mealplan_entry_created"
+        },
+        "mealplan_entry_updated": {
+          "name": "mealplan_entry_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.mealplan_entry_updated"
+        },
+        "mealplan_entry_deleted": {
+          "name": "mealplan_entry_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.mealplan_entry_deleted"
+        },
+        "shopping_list_created": {
+          "name": "shopping_list_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.shopping_list_created"
+        },
+        "shopping_list_updated": {
+          "name": "shopping_list_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.shopping_list_updated"
+        },
+        "shopping_list_deleted": {
+          "name": "shopping_list_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.shopping_list_deleted"
+        },
+        "cookbook_created": {
+          "name": "cookbook_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.cookbook_created"
+        },
+        "cookbook_updated": {
+          "name": "cookbook_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.cookbook_updated"
+        },
+        "cookbook_deleted": {
+          "name": "cookbook_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.cookbook_deleted"
+        },
+        "tag_created": {
+          "name": "tag_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.tag_created"
+        },
+        "tag_updated": {
+          "name": "tag_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.tag_updated"
+        },
+        "tag_deleted": {
+          "name": "tag_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.tag_deleted"
+        },
+        "category_created": {
+          "name": "category_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.category_created"
+        },
+        "category_updated": {
+          "name": "category_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.category_updated"
+        },
+        "category_deleted": {
+          "name": "category_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.category_deleted"
+        },
+        "label_created": {
+          "name": "label_created",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.label_created"
+        },
+        "label_updated": {
+          "name": "label_updated",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.label_updated"
+        },
+        "label_deleted": {
+          "name": "label_deleted",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.label_deleted"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupEventNotifierOptionsModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupEventNotifierOptionsModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupEventNotifierOptionsModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupEventNotifierOptionsModel.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "GroupInviteToken": {
+      "table": "invite_tokens",
+      "columns": {
+        "token": {
+          "name": "token",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupInviteToken.token"
+        },
+        "uses_left": {
+          "name": "uses_left",
+          "kind": "number",
+          "filterable": false,
+          "display": "GroupInviteToken.uses_left"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupInviteToken.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupInviteToken.household_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "GroupInviteToken.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupInviteToken.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupInviteToken.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupInviteToken.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupInviteToken.group"
+        },
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupInviteToken.household"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupMealPlan": {
+      "table": "group_meal_plans",
+      "columns": {
+        "date": {
+          "name": "date",
+          "kind": "date",
+          "filterable": true,
+          "display": "GroupMealPlan.date"
+        },
+        "entry_type": {
+          "name": "entry_type",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupMealPlan.entry_type"
+        },
+        "title": {
+          "name": "title",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupMealPlan.title"
+        },
+        "text": {
+          "name": "text",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupMealPlan.text"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupMealPlan.group_id"
+        },
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupMealPlan.user_id"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupMealPlan.recipe_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "GroupMealPlan.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupMealPlan.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupMealPlan.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupMealPlan.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupMealPlan.group"
+        },
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupMealPlan.user"
+        },
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupMealPlan.recipe"
+        }
+      },
+      "proxies": {
+        "household_id": [
+          "user",
+          "household_id"
+        ],
+        "household": [
+          "user",
+          "household"
+        ]
+      }
+    },
+    "GroupMealPlanRules": {
+      "table": "group_meal_plan_rules",
+      "columns": {
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupMealPlanRules.id"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupMealPlanRules.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupMealPlanRules.household_id"
+        },
+        "day": {
+          "name": "day",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupMealPlanRules.day"
+        },
+        "entry_type": {
+          "name": "entry_type",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupMealPlanRules.entry_type"
+        },
+        "query_filter_string": {
+          "name": "query_filter_string",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupMealPlanRules.query_filter_string"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupMealPlanRules.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupMealPlanRules.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupMealPlanRules.updated_at"
+        }
+      },
+      "relations": {
+        "categories": {
+          "model": "Category",
+          "join": "{parent}.id = {link}.group_plan_rule_id",
+          "secondary": "plan_rules_to_categories",
+          "secondaryJoin": "{target}.id = {link}.category_id",
+          "display": "GroupMealPlanRules.categories"
+        },
+        "tags": {
+          "model": "Tag",
+          "join": "{parent}.id = {link}.plan_rule_id",
+          "secondary": "plan_rules_to_tags",
+          "secondaryJoin": "{target}.id = {link}.tag_id",
+          "display": "GroupMealPlanRules.tags"
+        },
+        "households": {
+          "model": "Household",
+          "join": "{parent}.id = {link}.group_plan_rule_id",
+          "secondary": "plan_rules_to_households",
+          "secondaryJoin": "{target}.id = {link}.household_id",
+          "display": "GroupMealPlanRules.households"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupPreferencesModel": {
+      "table": "group_preferences",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupPreferencesModel.group_id"
+        },
+        "private_group": {
+          "name": "private_group",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.private_group"
+        },
+        "show_announcements": {
+          "name": "show_announcements",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.show_announcements"
+        },
+        "first_day_of_week": {
+          "name": "first_day_of_week",
+          "kind": "number",
+          "filterable": false,
+          "display": "GroupPreferencesModel.first_day_of_week"
+        },
+        "recipe_public": {
+          "name": "recipe_public",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.recipe_public"
+        },
+        "recipe_show_nutrition": {
+          "name": "recipe_show_nutrition",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.recipe_show_nutrition"
+        },
+        "recipe_show_assets": {
+          "name": "recipe_show_assets",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.recipe_show_assets"
+        },
+        "recipe_landscape_view": {
+          "name": "recipe_landscape_view",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.recipe_landscape_view"
+        },
+        "recipe_disable_comments": {
+          "name": "recipe_disable_comments",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.recipe_disable_comments"
+        },
+        "recipe_disable_amount": {
+          "name": "recipe_disable_amount",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupPreferencesModel.recipe_disable_amount"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupPreferencesModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupPreferencesModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupPreferencesModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupPreferencesModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupPreferencesModel.group"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupRecipeAction": {
+      "table": "recipe_actions",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupRecipeAction.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupRecipeAction.household_id"
+        },
+        "action_type": {
+          "name": "action_type",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupRecipeAction.action_type"
+        },
+        "title": {
+          "name": "title",
+          "kind": "string",
+          "filterable": true,
+          "display": "GroupRecipeAction.title"
+        },
+        "url": {
+          "name": "url",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupRecipeAction.url"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "GroupRecipeAction.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupRecipeAction.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupRecipeAction.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupRecipeAction.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupRecipeAction.group"
+        },
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupRecipeAction.household"
+        }
+      },
+      "proxies": {}
+    },
+    "GroupWebhooksModel": {
+      "table": "webhook_urls",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupWebhooksModel.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupWebhooksModel.household_id"
+        },
+        "enabled": {
+          "name": "enabled",
+          "kind": "bool",
+          "filterable": false,
+          "display": "GroupWebhooksModel.enabled"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupWebhooksModel.name"
+        },
+        "url": {
+          "name": "url",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupWebhooksModel.url"
+        },
+        "webhook_type": {
+          "name": "webhook_type",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupWebhooksModel.webhook_type"
+        },
+        "scheduled_time": {
+          "name": "scheduled_time",
+          "kind": "other",
+          "filterable": false,
+          "display": "GroupWebhooksModel.scheduled_time"
+        },
+        "time": {
+          "name": "time",
+          "kind": "string",
+          "filterable": false,
+          "display": "GroupWebhooksModel.time"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "GroupWebhooksModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupWebhooksModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupWebhooksModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "GroupWebhooksModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupWebhooksModel.group"
+        },
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "GroupWebhooksModel.household"
+        }
+      },
+      "proxies": {}
+    },
+    "Household": {
+      "table": "households",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "Household.name"
+        },
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "Household.slug"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Household.group_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Household.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Household.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Household.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Household.updated_at"
+        }
+      },
+      "relations": {
+        "invite_tokens": {
+          "model": "GroupInviteToken",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.invite_tokens"
+        },
+        "preferences": {
+          "model": "HouseholdPreferencesModel",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.preferences"
+        },
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.group"
+        },
+        "users": {
+          "model": "User",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.users"
+        },
+        "recipe_actions": {
+          "model": "GroupRecipeAction",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.recipe_actions"
+        },
+        "cookbooks": {
+          "model": "CookBook",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.cookbooks"
+        },
+        "webhooks": {
+          "model": "GroupWebhooksModel",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.webhooks"
+        },
+        "group_event_notifiers": {
+          "model": "GroupEventNotifierModel",
+          "join": "{parent}.id = {target}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Household.group_event_notifiers"
+        },
+        "made_recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {link}.household_id",
+          "secondary": "households_to_recipes",
+          "secondaryJoin": "{target}.id = {link}.recipe_id",
+          "display": "Household.made_recipes"
+        },
+        "ingredient_foods_on_hand": {
+          "model": "IngredientFoodModel",
+          "join": "{parent}.id = {link}.household_id",
+          "secondary": "households_to_ingredient_foods",
+          "secondaryJoin": "{target}.id = {link}.food_id",
+          "display": "Household.ingredient_foods_on_hand"
+        },
+        "tools_on_hand": {
+          "model": "Tool",
+          "join": "{parent}.id = {link}.household_id",
+          "secondary": "households_to_tools",
+          "secondaryJoin": "{target}.id = {link}.tool_id",
+          "display": "Household.tools_on_hand"
+        }
+      },
+      "proxies": {}
+    },
+    "HouseholdPreferencesModel": {
+      "table": "household_preferences",
+      "columns": {
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.household_id"
+        },
+        "private_household": {
+          "name": "private_household",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.private_household"
+        },
+        "show_announcements": {
+          "name": "show_announcements",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.show_announcements"
+        },
+        "lock_recipe_edits_from_other_households": {
+          "name": "lock_recipe_edits_from_other_households",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.lock_recipe_edits_from_other_households"
+        },
+        "first_day_of_week": {
+          "name": "first_day_of_week",
+          "kind": "number",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.first_day_of_week"
+        },
+        "recipe_public": {
+          "name": "recipe_public",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.recipe_public"
+        },
+        "recipe_show_nutrition": {
+          "name": "recipe_show_nutrition",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.recipe_show_nutrition"
+        },
+        "recipe_show_assets": {
+          "name": "recipe_show_assets",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.recipe_show_assets"
+        },
+        "recipe_landscape_view": {
+          "name": "recipe_landscape_view",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.recipe_landscape_view"
+        },
+        "recipe_disable_comments": {
+          "name": "recipe_disable_comments",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.recipe_disable_comments"
+        },
+        "recipe_disable_amount": {
+          "name": "recipe_disable_amount",
+          "kind": "bool",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.recipe_disable_amount"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "HouseholdPreferencesModel.updated_at"
+        }
+      },
+      "relations": {
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "HouseholdPreferencesModel.household"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "household",
+          "group_id"
+        ]
+      }
+    },
+    "HouseholdToRecipe": {
+      "table": "households_to_recipes",
+      "columns": {
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "HouseholdToRecipe.household_id"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "HouseholdToRecipe.recipe_id"
+        },
+        "last_made": {
+          "name": "last_made",
+          "kind": "datetime",
+          "filterable": false,
+          "display": "HouseholdToRecipe.last_made"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "HouseholdToRecipe.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "HouseholdToRecipe.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "HouseholdToRecipe.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "HouseholdToRecipe.updated_at"
+        }
+      },
+      "relations": {
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "HouseholdToRecipe.household"
+        },
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "HouseholdToRecipe.recipe"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "household",
+          "group_id"
+        ]
+      }
+    },
+    "IngredientFoodAliasModel": {
+      "table": "ingredient_foods_aliases",
+      "columns": {
+        "food_id": {
+          "name": "food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.food_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.name"
+        },
+        "name_normalized": {
+          "name": "name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.name_normalized"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodAliasModel.updated_at"
+        }
+      },
+      "relations": {
+        "food": {
+          "model": "IngredientFoodModel",
+          "join": "{target}.id = {parent}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodAliasModel.food"
+        }
+      },
+      "proxies": {}
+    },
+    "IngredientFoodExtras": {
+      "table": "ingredient_food_extras",
+      "columns": {
+        "ingredient_food_id": {
+          "name": "ingredient_food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodExtras.ingredient_food_id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodExtras.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodExtras.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodExtras.updated_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "IngredientFoodExtras.id"
+        },
+        "key_name": {
+          "name": "key_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodExtras.key_name"
+        },
+        "value": {
+          "name": "value",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodExtras.value"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "IngredientFoodModel": {
+      "table": "ingredient_foods",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodModel.group_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodModel.name"
+        },
+        "plural_name": {
+          "name": "plural_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodModel.plural_name"
+        },
+        "description": {
+          "name": "description",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodModel.description"
+        },
+        "recipe_count": {
+          "name": "%(281473071333072 anon)s",
+          "kind": "number",
+          "filterable": false,
+          "display": "IngredientFoodModel.recipe_count"
+        },
+        "label_id": {
+          "name": "label_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodModel.label_id"
+        },
+        "name_normalized": {
+          "name": "name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodModel.name_normalized"
+        },
+        "plural_name_normalized": {
+          "name": "plural_name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodModel.plural_name_normalized"
+        },
+        "on_hand": {
+          "name": "on_hand",
+          "kind": "bool",
+          "filterable": false,
+          "display": "IngredientFoodModel.on_hand"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.group"
+        },
+        "households_with_ingredient_food": {
+          "model": "Household",
+          "join": "{parent}.id = {link}.food_id",
+          "secondary": "households_to_ingredient_foods",
+          "secondaryJoin": "{target}.id = {link}.household_id",
+          "display": "IngredientFoodModel.households_with_ingredient_food"
+        },
+        "ingredients": {
+          "model": "RecipeIngredientModel",
+          "join": "{parent}.id = {target}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.ingredients"
+        },
+        "aliases": {
+          "model": "IngredientFoodAliasModel",
+          "join": "{parent}.id = {target}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.aliases"
+        },
+        "substitutions": {
+          "model": "IngredientFoodSubstitutionModel",
+          "join": "{parent}.id = {target}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.substitutions"
+        },
+        "substitution_references": {
+          "model": "IngredientFoodSubstitutionModel",
+          "join": "{parent}.id = {target}.substitute_food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.substitution_references"
+        },
+        "recipe_substitution_references": {
+          "model": "RecipeIngredientSubstitutionModel",
+          "join": "{parent}.id = {target}.substitute_food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.recipe_substitution_references"
+        },
+        "extras": {
+          "model": "IngredientFoodExtras",
+          "join": "{parent}.id = {target}.ingredient_food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.extras"
+        },
+        "label": {
+          "model": "MultiPurposeLabel",
+          "join": "{target}.id = {parent}.label_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodModel.label"
+        }
+      },
+      "proxies": {}
+    },
+    "IngredientFoodSubstitutionModel": {
+      "table": "ingredient_foods_substitutions",
+      "columns": {
+        "food_id": {
+          "name": "food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.food_id"
+        },
+        "substitute_food_id": {
+          "name": "substitute_food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.substitute_food_id"
+        },
+        "note": {
+          "name": "note",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.note"
+        },
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.position"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientFoodSubstitutionModel.updated_at"
+        }
+      },
+      "relations": {
+        "food": {
+          "model": "IngredientFoodModel",
+          "join": "{target}.id = {parent}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodSubstitutionModel.food"
+        },
+        "substitute_food": {
+          "model": "IngredientFoodModel",
+          "join": "{target}.id = {parent}.substitute_food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientFoodSubstitutionModel.substitute_food"
+        }
+      },
+      "proxies": {}
+    },
+    "IngredientUnitAliasModel": {
+      "table": "ingredient_units_aliases",
+      "columns": {
+        "unit_id": {
+          "name": "unit_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.unit_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.name"
+        },
+        "name_normalized": {
+          "name": "name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.name_normalized"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientUnitAliasModel.updated_at"
+        }
+      },
+      "relations": {
+        "unit": {
+          "model": "IngredientUnitModel",
+          "join": "{target}.id = {parent}.unit_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientUnitAliasModel.unit"
+        }
+      },
+      "proxies": {}
+    },
+    "IngredientUnitModel": {
+      "table": "ingredient_units",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientUnitModel.group_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.name"
+        },
+        "plural_name": {
+          "name": "plural_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.plural_name"
+        },
+        "description": {
+          "name": "description",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.description"
+        },
+        "abbreviation": {
+          "name": "abbreviation",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.abbreviation"
+        },
+        "plural_abbreviation": {
+          "name": "plural_abbreviation",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.plural_abbreviation"
+        },
+        "use_abbreviation": {
+          "name": "use_abbreviation",
+          "kind": "bool",
+          "filterable": true,
+          "display": "IngredientUnitModel.use_abbreviation"
+        },
+        "fraction": {
+          "name": "fraction",
+          "kind": "bool",
+          "filterable": true,
+          "display": "IngredientUnitModel.fraction"
+        },
+        "standard_quantity": {
+          "name": "standard_quantity",
+          "kind": "real",
+          "filterable": true,
+          "display": "IngredientUnitModel.standard_quantity"
+        },
+        "standard_unit": {
+          "name": "standard_unit",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.standard_unit"
+        },
+        "name_normalized": {
+          "name": "name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.name_normalized"
+        },
+        "plural_name_normalized": {
+          "name": "plural_name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.plural_name_normalized"
+        },
+        "abbreviation_normalized": {
+          "name": "abbreviation_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.abbreviation_normalized"
+        },
+        "plural_abbreviation_normalized": {
+          "name": "plural_abbreviation_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "IngredientUnitModel.plural_abbreviation_normalized"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "IngredientUnitModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientUnitModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientUnitModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "IngredientUnitModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientUnitModel.group"
+        },
+        "ingredients": {
+          "model": "RecipeIngredientModel",
+          "join": "{parent}.id = {target}.unit_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientUnitModel.ingredients"
+        },
+        "aliases": {
+          "model": "IngredientUnitAliasModel",
+          "join": "{parent}.id = {target}.unit_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "IngredientUnitModel.aliases"
+        }
+      },
+      "proxies": {}
+    },
+    "LongLiveToken": {
+      "table": "long_live_tokens",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "LongLiveToken.name"
+        },
+        "token": {
+          "name": "token",
+          "kind": "string",
+          "filterable": false,
+          "display": "LongLiveToken.token"
+        },
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "LongLiveToken.user_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "LongLiveToken.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "LongLiveToken.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "LongLiveToken.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "LongLiveToken.updated_at"
+        }
+      },
+      "relations": {
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "LongLiveToken.user"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "user",
+          "group_id"
+        ],
+        "household_id": [
+          "user",
+          "household_id"
+        ]
+      }
+    },
+    "MultiPurposeLabel": {
+      "table": "multi_purpose_labels",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "MultiPurposeLabel.name"
+        },
+        "color": {
+          "name": "color",
+          "kind": "string",
+          "filterable": true,
+          "display": "MultiPurposeLabel.color"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "MultiPurposeLabel.group_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "MultiPurposeLabel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "MultiPurposeLabel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "MultiPurposeLabel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "MultiPurposeLabel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "MultiPurposeLabel.group"
+        },
+        "shopping_list_items": {
+          "model": "ShoppingListItem",
+          "join": "{parent}.id = {target}.label_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "MultiPurposeLabel.shopping_list_items"
+        },
+        "foods": {
+          "model": "IngredientFoodModel",
+          "join": "{parent}.id = {target}.label_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "MultiPurposeLabel.foods"
+        },
+        "shopping_lists_label_settings": {
+          "model": "ShoppingListMultiPurposeLabel",
+          "join": "{parent}.id = {target}.label_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "MultiPurposeLabel.shopping_lists_label_settings"
+        }
+      },
+      "proxies": {}
+    },
+    "Note": {
+      "table": "notes",
+      "columns": {
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "Note.recipe_id"
+        },
+        "title": {
+          "name": "title",
+          "kind": "string",
+          "filterable": false,
+          "display": "Note.title"
+        },
+        "text": {
+          "name": "text",
+          "kind": "string",
+          "filterable": false,
+          "display": "Note.text"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "Note.reference_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "Note.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Note.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Note.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Note.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "Nutrition": {
+      "table": "recipe_nutrition",
+      "columns": {
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Nutrition.recipe_id"
+        },
+        "calories": {
+          "name": "calories",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.calories"
+        },
+        "carbohydrate_content": {
+          "name": "carbohydrate_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.carbohydrate_content"
+        },
+        "cholesterol_content": {
+          "name": "cholesterol_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.cholesterol_content"
+        },
+        "fat_content": {
+          "name": "fat_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.fat_content"
+        },
+        "fiber_content": {
+          "name": "fiber_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.fiber_content"
+        },
+        "protein_content": {
+          "name": "protein_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.protein_content"
+        },
+        "saturated_fat_content": {
+          "name": "saturated_fat_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.saturated_fat_content"
+        },
+        "sodium_content": {
+          "name": "sodium_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.sodium_content"
+        },
+        "sugar_content": {
+          "name": "sugar_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.sugar_content"
+        },
+        "trans_fat_content": {
+          "name": "trans_fat_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.trans_fat_content"
+        },
+        "unsaturated_fat_content": {
+          "name": "unsaturated_fat_content",
+          "kind": "string",
+          "filterable": true,
+          "display": "Nutrition.unsaturated_fat_content"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "Nutrition.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Nutrition.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Nutrition.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Nutrition.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "PasswordResetModel": {
+      "table": "password_reset_tokens",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "PasswordResetModel.user_id"
+        },
+        "token": {
+          "name": "token",
+          "kind": "string",
+          "filterable": false,
+          "display": "PasswordResetModel.token"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "PasswordResetModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "PasswordResetModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "PasswordResetModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "PasswordResetModel.updated_at"
+        }
+      },
+      "relations": {
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "PasswordResetModel.user"
+        }
+      },
+      "proxies": {}
+    },
+    "RecipeAsset": {
+      "table": "recipe_assets",
+      "columns": {
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeAsset.recipe_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeAsset.name"
+        },
+        "icon": {
+          "name": "icon",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeAsset.icon"
+        },
+        "file_name": {
+          "name": "file_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeAsset.file_name"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeAsset.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeAsset.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeAsset.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeAsset.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "RecipeComment": {
+      "table": "recipe_comments",
+      "columns": {
+        "text": {
+          "name": "text",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeComment.text"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeComment.recipe_id"
+        },
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeComment.user_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeComment.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeComment.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeComment.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeComment.updated_at"
+        }
+      },
+      "relations": {
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeComment.recipe"
+        },
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeComment.user"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "recipe",
+          "group_id"
+        ],
+        "household_id": [
+          "recipe",
+          "household_id"
+        ]
+      }
+    },
+    "RecipeIngredientModel": {
+      "table": "recipes_ingredients",
+      "columns": {
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeIngredientModel.position"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientModel.recipe_id"
+        },
+        "title": {
+          "name": "title",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeIngredientModel.title"
+        },
+        "note": {
+          "name": "note",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeIngredientModel.note"
+        },
+        "unit_id": {
+          "name": "unit_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientModel.unit_id"
+        },
+        "food_id": {
+          "name": "food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientModel.food_id"
+        },
+        "quantity": {
+          "name": "quantity",
+          "kind": "real",
+          "filterable": true,
+          "display": "RecipeIngredientModel.quantity"
+        },
+        "original_text": {
+          "name": "original_text",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeIngredientModel.original_text"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientModel.reference_id"
+        },
+        "referenced_recipe_id": {
+          "name": "referenced_recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientModel.referenced_recipe_id"
+        },
+        "note_normalized": {
+          "name": "note_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeIngredientModel.note_normalized"
+        },
+        "original_text_normalized": {
+          "name": "original_text_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeIngredientModel.original_text_normalized"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeIngredientModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientModel.updated_at"
+        }
+      },
+      "relations": {
+        "unit": {
+          "model": "IngredientUnitModel",
+          "join": "{target}.id = {parent}.unit_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeIngredientModel.unit"
+        },
+        "food": {
+          "model": "IngredientFoodModel",
+          "join": "{target}.id = {parent}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeIngredientModel.food"
+        },
+        "referenced_recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.referenced_recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeIngredientModel.referenced_recipe"
+        },
+        "substitutions": {
+          "model": "RecipeIngredientSubstitutionModel",
+          "join": "{parent}.id = {target}.ingredient_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeIngredientModel.substitutions"
+        }
+      },
+      "proxies": {}
+    },
+    "RecipeIngredientRefLink": {
+      "table": "recipe_ingredient_ref_link",
+      "columns": {
+        "instruction_id": {
+          "name": "instruction_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeIngredientRefLink.instruction_id"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeIngredientRefLink.reference_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "RecipeIngredientRefLink.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientRefLink.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientRefLink.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientRefLink.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "RecipeIngredientSubstitutionModel": {
+      "table": "recipes_ingredients_substitutions",
+      "columns": {
+        "ingredient_id": {
+          "name": "ingredient_id",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.ingredient_id"
+        },
+        "substitute_food_id": {
+          "name": "substitute_food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.substitute_food_id"
+        },
+        "note": {
+          "name": "note",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.note"
+        },
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.position"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeIngredientSubstitutionModel.updated_at"
+        }
+      },
+      "relations": {
+        "ingredient": {
+          "model": "RecipeIngredientModel",
+          "join": "{target}.id = {parent}.ingredient_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeIngredientSubstitutionModel.ingredient"
+        },
+        "substitute_food": {
+          "model": "IngredientFoodModel",
+          "join": "{target}.id = {parent}.substitute_food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeIngredientSubstitutionModel.substitute_food"
+        }
+      },
+      "proxies": {}
+    },
+    "RecipeInstruction": {
+      "table": "recipe_instructions",
+      "columns": {
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeInstruction.recipe_id"
+        },
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": false,
+          "display": "RecipeInstruction.position"
+        },
+        "type": {
+          "name": "type",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeInstruction.type"
+        },
+        "title": {
+          "name": "title",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeInstruction.title"
+        },
+        "text": {
+          "name": "text",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeInstruction.text"
+        },
+        "summary": {
+          "name": "summary",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeInstruction.summary"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeInstruction.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeInstruction.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeInstruction.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeInstruction.updated_at"
+        }
+      },
+      "relations": {
+        "ingredient_references": {
+          "model": "RecipeIngredientRefLink",
+          "join": "{parent}.id = {target}.instruction_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeInstruction.ingredient_references"
+        },
+        "note_references": {
+          "model": "RecipeNoteRefLink",
+          "join": "{parent}.id = {target}.instruction_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeInstruction.note_references"
+        }
+      },
+      "proxies": {}
+    },
+    "RecipeModel": {
+      "table": "recipes",
+      "columns": {
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.slug"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeModel.group_id"
+        },
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeModel.user_id"
+        },
+        "rating": {
+          "name": "rating",
+          "kind": "real",
+          "filterable": true,
+          "display": "RecipeModel.rating"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.name"
+        },
+        "description": {
+          "name": "description",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.description"
+        },
+        "image": {
+          "name": "image",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.image"
+        },
+        "total_time": {
+          "name": "total_time",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.total_time"
+        },
+        "prep_time": {
+          "name": "prep_time",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.prep_time"
+        },
+        "perform_time": {
+          "name": "perform_time",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.perform_time"
+        },
+        "total_time_seconds": {
+          "name": "total_time_seconds",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeModel.total_time_seconds"
+        },
+        "prep_time_seconds": {
+          "name": "prep_time_seconds",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeModel.prep_time_seconds"
+        },
+        "perform_time_seconds": {
+          "name": "perform_time_seconds",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeModel.perform_time_seconds"
+        },
+        "recipe_yield": {
+          "name": "recipe_yield",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.recipe_yield"
+        },
+        "recipe_yield_quantity": {
+          "name": "recipe_yield_quantity",
+          "kind": "real",
+          "filterable": true,
+          "display": "RecipeModel.recipe_yield_quantity"
+        },
+        "recipe_servings": {
+          "name": "recipe_servings",
+          "kind": "real",
+          "filterable": true,
+          "display": "RecipeModel.recipe_servings"
+        },
+        "org_url": {
+          "name": "org_url",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.org_url"
+        },
+        "date_added": {
+          "name": "date_added",
+          "kind": "date",
+          "filterable": true,
+          "display": "RecipeModel.date_added"
+        },
+        "date_updated": {
+          "name": "date_updated",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeModel.date_updated"
+        },
+        "last_made": {
+          "name": "last_made",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeModel.last_made"
+        },
+        "name_normalized": {
+          "name": "name_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.name_normalized"
+        },
+        "description_normalized": {
+          "name": "description_normalized",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeModel.description_normalized"
+        },
+        "cook_time": {
+          "name": "cook_time",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeModel.cook_time"
+        },
+        "recipeCuisine": {
+          "name": "recipeCuisine",
+          "kind": "string",
+          "filterable": false,
+          "display": "RecipeModel.recipeCuisine"
+        },
+        "is_ocr_recipe": {
+          "name": "is_ocr_recipe",
+          "kind": "bool",
+          "filterable": false,
+          "display": "RecipeModel.is_ocr_recipe"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.group"
+        },
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.user"
+        },
+        "rated_by": {
+          "model": "User",
+          "join": "{parent}.id = {link}.recipe_id",
+          "secondary": "users_to_recipes",
+          "secondaryJoin": "{target}.id = {link}.user_id",
+          "display": "RecipeModel.rated_by"
+        },
+        "favorited_by": {
+          "model": "User",
+          "join": "{parent}.id = {link}.recipe_id AND {link}.is_favorite = true",
+          "secondary": "users_to_recipes",
+          "secondaryJoin": "{target}.id = {link}.user_id",
+          "display": "RecipeModel.favorited_by"
+        },
+        "meal_entries": {
+          "model": "GroupMealPlan",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.meal_entries"
+        },
+        "assets": {
+          "model": "RecipeAsset",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.assets"
+        },
+        "nutrition": {
+          "model": "Nutrition",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.nutrition"
+        },
+        "recipe_category": {
+          "model": "Category",
+          "join": "{parent}.id = {link}.recipe_id",
+          "secondary": "recipes_to_categories",
+          "secondaryJoin": "{target}.id = {link}.category_id",
+          "display": "RecipeModel.recipe_category"
+        },
+        "tools": {
+          "model": "Tool",
+          "join": "{parent}.id = {link}.recipe_id",
+          "secondary": "recipes_to_tools",
+          "secondaryJoin": "{target}.id = {link}.tool_id",
+          "display": "RecipeModel.tools"
+        },
+        "recipe_ingredient": {
+          "model": "RecipeIngredientModel",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.recipe_ingredient"
+        },
+        "referenced_ingredients": {
+          "model": "RecipeIngredientModel",
+          "join": "{parent}.id = {target}.referenced_recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.referenced_ingredients"
+        },
+        "recipe_instructions": {
+          "model": "RecipeInstruction",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.recipe_instructions"
+        },
+        "share_tokens": {
+          "model": "RecipeShareTokenModel",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.share_tokens"
+        },
+        "comments": {
+          "model": "RecipeComment",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.comments"
+        },
+        "timeline_events": {
+          "model": "RecipeTimelineEvent",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.timeline_events"
+        },
+        "settings": {
+          "model": "RecipeSettings",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.settings"
+        },
+        "tags": {
+          "model": "Tag",
+          "join": "{parent}.id = {link}.recipe_id",
+          "secondary": "recipes_to_tags",
+          "secondaryJoin": "{target}.id = {link}.tag_id",
+          "display": "RecipeModel.tags"
+        },
+        "notes": {
+          "model": "Note",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.notes"
+        },
+        "extras": {
+          "model": "ApiExtras",
+          "join": "{parent}.id = {target}.recipee_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.extras"
+        },
+        "made_by": {
+          "model": "Household",
+          "join": "{parent}.id = {link}.recipe_id",
+          "secondary": "households_to_recipes",
+          "secondaryJoin": "{target}.id = {link}.household_id",
+          "display": "RecipeModel.made_by"
+        },
+        "shopping_list_refs": {
+          "model": "ShoppingListRecipeReference",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.shopping_list_refs"
+        },
+        "shopping_list_item_refs": {
+          "model": "ShoppingListItemRecipeReference",
+          "join": "{parent}.id = {target}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeModel.shopping_list_item_refs"
+        }
+      },
+      "proxies": {
+        "household_id": [
+          "user",
+          "household_id"
+        ],
+        "household": [
+          "user",
+          "household"
+        ]
+      }
+    },
+    "RecipeNoteRefLink": {
+      "table": "recipe_note_ref_link",
+      "columns": {
+        "instruction_id": {
+          "name": "instruction_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeNoteRefLink.instruction_id"
+        },
+        "reference_id": {
+          "name": "reference_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeNoteRefLink.reference_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "RecipeNoteRefLink.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeNoteRefLink.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeNoteRefLink.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeNoteRefLink.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "RecipeSettings": {
+      "table": "recipe_settings",
+      "columns": {
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeSettings.recipe_id"
+        },
+        "public": {
+          "name": "public",
+          "kind": "bool",
+          "filterable": true,
+          "display": "RecipeSettings.public"
+        },
+        "show_nutrition": {
+          "name": "show_nutrition",
+          "kind": "bool",
+          "filterable": true,
+          "display": "RecipeSettings.show_nutrition"
+        },
+        "show_assets": {
+          "name": "show_assets",
+          "kind": "bool",
+          "filterable": true,
+          "display": "RecipeSettings.show_assets"
+        },
+        "landscape_view": {
+          "name": "landscape_view",
+          "kind": "bool",
+          "filterable": true,
+          "display": "RecipeSettings.landscape_view"
+        },
+        "disable_comments": {
+          "name": "disable_comments",
+          "kind": "bool",
+          "filterable": true,
+          "display": "RecipeSettings.disable_comments"
+        },
+        "locked": {
+          "name": "locked",
+          "kind": "bool",
+          "filterable": true,
+          "display": "RecipeSettings.locked"
+        },
+        "disable_amount": {
+          "name": "disable_amount",
+          "kind": "bool",
+          "filterable": false,
+          "display": "RecipeSettings.disable_amount"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "RecipeSettings.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeSettings.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeSettings.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeSettings.updated_at"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "RecipeShareTokenModel": {
+      "table": "recipe_share_tokens",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeShareTokenModel.group_id"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeShareTokenModel.recipe_id"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeShareTokenModel.expires_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "RecipeShareTokenModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeShareTokenModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeShareTokenModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeShareTokenModel.updated_at"
+        }
+      },
+      "relations": {
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeShareTokenModel.recipe"
+        }
+      },
+      "proxies": {}
+    },
+    "RecipeTimelineEvent": {
+      "table": "recipe_timeline_events",
+      "columns": {
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.recipe_id"
+        },
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.user_id"
+        },
+        "subject": {
+          "name": "subject",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.subject"
+        },
+        "message": {
+          "name": "message",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.message"
+        },
+        "event_type": {
+          "name": "event_type",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.event_type"
+        },
+        "image": {
+          "name": "image",
+          "kind": "string",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.image"
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.timestamp"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "RecipeTimelineEvent.updated_at"
+        }
+      },
+      "relations": {
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeTimelineEvent.recipe"
+        },
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "RecipeTimelineEvent.user"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "recipe",
+          "group_id"
+        ],
+        "household_id": [
+          "recipe",
+          "household_id"
+        ]
+      }
+    },
+    "ReportEntryModel": {
+      "table": "report_entries",
+      "columns": {
+        "success": {
+          "name": "success",
+          "kind": "bool",
+          "filterable": false,
+          "display": "ReportEntryModel.success"
+        },
+        "message": {
+          "name": "message",
+          "kind": "string",
+          "filterable": false,
+          "display": "ReportEntryModel.message"
+        },
+        "exception": {
+          "name": "exception",
+          "kind": "string",
+          "filterable": false,
+          "display": "ReportEntryModel.exception"
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "kind": "datetime",
+          "filterable": false,
+          "display": "ReportEntryModel.timestamp"
+        },
+        "report_id": {
+          "name": "report_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "ReportEntryModel.report_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "ReportEntryModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ReportEntryModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ReportEntryModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ReportEntryModel.updated_at"
+        }
+      },
+      "relations": {
+        "report": {
+          "model": "ReportModel",
+          "join": "{target}.id = {parent}.report_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ReportEntryModel.report"
+        }
+      },
+      "proxies": {}
+    },
+    "ReportModel": {
+      "table": "group_reports",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "ReportModel.name"
+        },
+        "status": {
+          "name": "status",
+          "kind": "string",
+          "filterable": false,
+          "display": "ReportModel.status"
+        },
+        "category": {
+          "name": "category",
+          "kind": "string",
+          "filterable": false,
+          "display": "ReportModel.category"
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "kind": "datetime",
+          "filterable": false,
+          "display": "ReportModel.timestamp"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "ReportModel.group_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "ReportModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ReportModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ReportModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ReportModel.updated_at"
+        }
+      },
+      "relations": {
+        "entries": {
+          "model": "ReportEntryModel",
+          "join": "{parent}.id = {target}.report_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ReportModel.entries"
+        },
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ReportModel.group"
+        }
+      },
+      "proxies": {}
+    },
+    "ServerTaskModel": {
+      "table": "server_tasks",
+      "columns": {
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": false,
+          "display": "ServerTaskModel.name"
+        },
+        "completed_date": {
+          "name": "completed_date",
+          "kind": "datetime",
+          "filterable": false,
+          "display": "ServerTaskModel.completed_date"
+        },
+        "status": {
+          "name": "status",
+          "kind": "string",
+          "filterable": false,
+          "display": "ServerTaskModel.status"
+        },
+        "log": {
+          "name": "log",
+          "kind": "string",
+          "filterable": false,
+          "display": "ServerTaskModel.log"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "ServerTaskModel.group_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": false,
+          "display": "ServerTaskModel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ServerTaskModel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ServerTaskModel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ServerTaskModel.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ServerTaskModel.group"
+        }
+      },
+      "proxies": {}
+    },
+    "ShoppingList": {
+      "table": "shopping_lists",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingList.group_id"
+        },
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingList.user_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingList.name"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingList.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingList.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingList.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingList.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingList.group"
+        },
+        "user": {
+          "model": "User",
+          "join": "{target}.id = {parent}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingList.user"
+        },
+        "list_items": {
+          "model": "ShoppingListItem",
+          "join": "{parent}.id = {target}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingList.list_items"
+        },
+        "recipe_references": {
+          "model": "ShoppingListRecipeReference",
+          "join": "{parent}.id = {target}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingList.recipe_references"
+        },
+        "label_settings": {
+          "model": "ShoppingListMultiPurposeLabel",
+          "join": "{parent}.id = {target}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingList.label_settings"
+        },
+        "extras": {
+          "model": "ShoppingListExtras",
+          "join": "{parent}.id = {target}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingList.extras"
+        }
+      },
+      "proxies": {
+        "household_id": [
+          "user",
+          "household_id"
+        ],
+        "household": [
+          "user",
+          "household"
+        ]
+      }
+    },
+    "ShoppingListExtras": {
+      "table": "shopping_list_extras",
+      "columns": {
+        "shopping_list_id": {
+          "name": "shopping_list_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListExtras.shopping_list_id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListExtras.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListExtras.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListExtras.updated_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "ShoppingListExtras.id"
+        },
+        "key_name": {
+          "name": "key_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingListExtras.key_name"
+        },
+        "value": {
+          "name": "value",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingListExtras.value"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "ShoppingListItem": {
+      "table": "shopping_list_items",
+      "columns": {
+        "shopping_list_id": {
+          "name": "shopping_list_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItem.shopping_list_id"
+        },
+        "is_ingredient": {
+          "name": "is_ingredient",
+          "kind": "bool",
+          "filterable": true,
+          "display": "ShoppingListItem.is_ingredient"
+        },
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": true,
+          "display": "ShoppingListItem.position"
+        },
+        "checked": {
+          "name": "checked",
+          "kind": "bool",
+          "filterable": true,
+          "display": "ShoppingListItem.checked"
+        },
+        "quantity": {
+          "name": "quantity",
+          "kind": "real",
+          "filterable": true,
+          "display": "ShoppingListItem.quantity"
+        },
+        "note": {
+          "name": "note",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingListItem.note"
+        },
+        "unit_id": {
+          "name": "unit_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItem.unit_id"
+        },
+        "food_id": {
+          "name": "food_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItem.food_id"
+        },
+        "label_id": {
+          "name": "label_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItem.label_id"
+        },
+        "is_food": {
+          "name": "is_food",
+          "kind": "bool",
+          "filterable": false,
+          "display": "ShoppingListItem.is_food"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItem.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItem.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItem.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItem.updated_at"
+        }
+      },
+      "relations": {
+        "shopping_list": {
+          "model": "ShoppingList",
+          "join": "{target}.id = {parent}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItem.shopping_list"
+        },
+        "extras": {
+          "model": "ShoppingListItemExtras",
+          "join": "{parent}.id = {target}.shopping_list_item_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItem.extras"
+        },
+        "unit": {
+          "model": "IngredientUnitModel",
+          "join": "{target}.id = {parent}.unit_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItem.unit"
+        },
+        "food": {
+          "model": "IngredientFoodModel",
+          "join": "{target}.id = {parent}.food_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItem.food"
+        },
+        "label": {
+          "model": "MultiPurposeLabel",
+          "join": "{target}.id = {parent}.label_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItem.label"
+        },
+        "recipe_references": {
+          "model": "ShoppingListItemRecipeReference",
+          "join": "{parent}.id = {target}.shopping_list_item_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItem.recipe_references"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "shopping_list",
+          "group_id"
+        ],
+        "household_id": [
+          "shopping_list",
+          "household_id"
+        ]
+      }
+    },
+    "ShoppingListItemExtras": {
+      "table": "shopping_list_item_extras",
+      "columns": {
+        "shopping_list_item_id": {
+          "name": "shopping_list_item_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.shopping_list_item_id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.updated_at"
+        },
+        "id": {
+          "name": "id",
+          "kind": "number",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.id"
+        },
+        "key_name": {
+          "name": "key_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.key_name"
+        },
+        "value": {
+          "name": "value",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingListItemExtras.value"
+        }
+      },
+      "relations": {},
+      "proxies": {}
+    },
+    "ShoppingListItemRecipeReference": {
+      "table": "shopping_list_item_recipe_reference",
+      "columns": {
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.id"
+        },
+        "shopping_list_item_id": {
+          "name": "shopping_list_item_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.shopping_list_item_id"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.recipe_id"
+        },
+        "recipe_quantity": {
+          "name": "recipe_quantity",
+          "kind": "real",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.recipe_quantity"
+        },
+        "recipe_scale": {
+          "name": "recipe_scale",
+          "kind": "real",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.recipe_scale"
+        },
+        "recipe_note": {
+          "name": "recipe_note",
+          "kind": "string",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.recipe_note"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListItemRecipeReference.updated_at"
+        }
+      },
+      "relations": {
+        "shopping_list_item": {
+          "model": "ShoppingListItem",
+          "join": "{target}.id = {parent}.shopping_list_item_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItemRecipeReference.shopping_list_item"
+        },
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListItemRecipeReference.recipe"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "shopping_list_item",
+          "group_id"
+        ],
+        "household_id": [
+          "shopping_list_item",
+          "household_id"
+        ]
+      }
+    },
+    "ShoppingListMultiPurposeLabel": {
+      "table": "shopping_lists_multi_purpose_labels",
+      "columns": {
+        "shopping_list_id": {
+          "name": "shopping_list_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.shopping_list_id"
+        },
+        "label_id": {
+          "name": "label_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.label_id"
+        },
+        "position": {
+          "name": "position",
+          "kind": "number",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.position"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListMultiPurposeLabel.updated_at"
+        }
+      },
+      "relations": {
+        "shopping_list": {
+          "model": "ShoppingList",
+          "join": "{target}.id = {parent}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListMultiPurposeLabel.shopping_list"
+        },
+        "label": {
+          "model": "MultiPurposeLabel",
+          "join": "{target}.id = {parent}.label_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListMultiPurposeLabel.label"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "shopping_list",
+          "group_id"
+        ],
+        "household_id": [
+          "shopping_list",
+          "household_id"
+        ]
+      }
+    },
+    "ShoppingListRecipeReference": {
+      "table": "shopping_list_recipe_reference",
+      "columns": {
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.id"
+        },
+        "shopping_list_id": {
+          "name": "shopping_list_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.shopping_list_id"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.recipe_id"
+        },
+        "recipe_quantity": {
+          "name": "recipe_quantity",
+          "kind": "real",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.recipe_quantity"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "ShoppingListRecipeReference.updated_at"
+        }
+      },
+      "relations": {
+        "shopping_list": {
+          "model": "ShoppingList",
+          "join": "{target}.id = {parent}.shopping_list_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListRecipeReference.shopping_list"
+        },
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "ShoppingListRecipeReference.recipe"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "shopping_list",
+          "group_id"
+        ],
+        "household_id": [
+          "shopping_list",
+          "household_id"
+        ]
+      }
+    },
+    "Tag": {
+      "table": "tags",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Tag.group_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "Tag.name"
+        },
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "Tag.slug"
+        },
+        "recipe_count": {
+          "name": "%(281473068490960 anon)s",
+          "kind": "number",
+          "filterable": false,
+          "display": "Tag.recipe_count"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Tag.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Tag.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Tag.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Tag.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Tag.group"
+        },
+        "recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {link}.tag_id",
+          "secondary": "recipes_to_tags",
+          "secondaryJoin": "{target}.id = {link}.recipe_id",
+          "display": "Tag.recipes"
+        }
+      },
+      "proxies": {}
+    },
+    "Tool": {
+      "table": "tools",
+      "columns": {
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Tool.group_id"
+        },
+        "name": {
+          "name": "name",
+          "kind": "string",
+          "filterable": true,
+          "display": "Tool.name"
+        },
+        "slug": {
+          "name": "slug",
+          "kind": "string",
+          "filterable": true,
+          "display": "Tool.slug"
+        },
+        "recipe_count": {
+          "name": "%(281473071196640 anon)s",
+          "kind": "number",
+          "filterable": false,
+          "display": "Tool.recipe_count"
+        },
+        "on_hand": {
+          "name": "on_hand",
+          "kind": "bool",
+          "filterable": false,
+          "display": "Tool.on_hand"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "Tool.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Tool.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Tool.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "Tool.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "Tool.group"
+        },
+        "households_with_tool": {
+          "model": "Household",
+          "join": "{parent}.id = {link}.tool_id",
+          "secondary": "households_to_tools",
+          "secondaryJoin": "{target}.id = {link}.household_id",
+          "display": "Tool.households_with_tool"
+        },
+        "recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {link}.tool_id",
+          "secondary": "recipes_to_tools",
+          "secondaryJoin": "{target}.id = {link}.recipe_id",
+          "display": "Tool.recipes"
+        }
+      },
+      "proxies": {}
+    },
+    "User": {
+      "table": "users",
+      "columns": {
+        "full_name": {
+          "name": "full_name",
+          "kind": "string",
+          "filterable": true,
+          "display": "User.full_name"
+        },
+        "username": {
+          "name": "username",
+          "kind": "string",
+          "filterable": true,
+          "display": "User.username"
+        },
+        "email": {
+          "name": "email",
+          "kind": "string",
+          "filterable": false,
+          "display": "User.email"
+        },
+        "password": {
+          "name": "password",
+          "kind": "string",
+          "filterable": false,
+          "display": "User.password"
+        },
+        "auth_method": {
+          "name": "auth_method",
+          "kind": "string",
+          "filterable": false,
+          "display": "User.auth_method"
+        },
+        "admin": {
+          "name": "admin",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.admin"
+        },
+        "advanced": {
+          "name": "advanced",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.advanced"
+        },
+        "group_id": {
+          "name": "group_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "User.group_id"
+        },
+        "household_id": {
+          "name": "household_id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "User.household_id"
+        },
+        "cache_key": {
+          "name": "cache_key",
+          "kind": "string",
+          "filterable": false,
+          "display": "User.cache_key"
+        },
+        "external_avatar_hash": {
+          "name": "external_avatar_hash",
+          "kind": "string",
+          "filterable": false,
+          "display": "User.external_avatar_hash"
+        },
+        "login_attemps": {
+          "name": "login_attemps",
+          "kind": "number",
+          "filterable": false,
+          "display": "User.login_attemps"
+        },
+        "locked_at": {
+          "name": "locked_at",
+          "kind": "datetime",
+          "filterable": false,
+          "display": "User.locked_at"
+        },
+        "tokens_valid_after": {
+          "name": "tokens_valid_after",
+          "kind": "datetime",
+          "filterable": false,
+          "display": "User.tokens_valid_after"
+        },
+        "show_announcements": {
+          "name": "show_announcements",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.show_announcements"
+        },
+        "last_read_announcement": {
+          "name": "last_read_announcement",
+          "kind": "string",
+          "filterable": false,
+          "display": "User.last_read_announcement"
+        },
+        "can_manage_household": {
+          "name": "can_manage_household",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.can_manage_household"
+        },
+        "can_manage": {
+          "name": "can_manage",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.can_manage"
+        },
+        "can_invite": {
+          "name": "can_invite",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.can_invite"
+        },
+        "can_organize": {
+          "name": "can_organize",
+          "kind": "bool",
+          "filterable": false,
+          "display": "User.can_organize"
+        },
+        "owned_recipes_id": {
+          "name": "owned_recipes_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "User.owned_recipes_id"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": true,
+          "display": "User.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "User.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "User.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "User.updated_at"
+        }
+      },
+      "relations": {
+        "group": {
+          "model": "Group",
+          "join": "{target}.id = {parent}.group_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.group"
+        },
+        "household": {
+          "model": "Household",
+          "join": "{target}.id = {parent}.household_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.household"
+        },
+        "tokens": {
+          "model": "LongLiveToken",
+          "join": "{parent}.id = {target}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.tokens"
+        },
+        "comments": {
+          "model": "RecipeComment",
+          "join": "{parent}.id = {target}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.comments"
+        },
+        "recipe_timeline_events": {
+          "model": "RecipeTimelineEvent",
+          "join": "{parent}.id = {target}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.recipe_timeline_events"
+        },
+        "password_reset_tokens": {
+          "model": "PasswordResetModel",
+          "join": "{parent}.id = {target}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.password_reset_tokens"
+        },
+        "owned_recipes": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.owned_recipes_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.owned_recipes"
+        },
+        "mealplans": {
+          "model": "GroupMealPlan",
+          "join": "{parent}.id = {target}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.mealplans"
+        },
+        "shopping_lists": {
+          "model": "ShoppingList",
+          "join": "{parent}.id = {target}.user_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "User.shopping_lists"
+        },
+        "rated_recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {link}.user_id",
+          "secondary": "users_to_recipes",
+          "secondaryJoin": "{target}.id = {link}.recipe_id",
+          "display": "User.rated_recipes"
+        },
+        "favorite_recipes": {
+          "model": "RecipeModel",
+          "join": "{parent}.id = {link}.user_id AND {link}.is_favorite = true",
+          "secondary": "users_to_recipes",
+          "secondaryJoin": "{target}.id = {link}.recipe_id",
+          "display": "User.favorite_recipes"
+        }
+      },
+      "proxies": {}
+    },
+    "UserToRecipe": {
+      "table": "users_to_recipes",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "UserToRecipe.user_id"
+        },
+        "recipe_id": {
+          "name": "recipe_id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "UserToRecipe.recipe_id"
+        },
+        "rating": {
+          "name": "rating",
+          "kind": "real",
+          "filterable": false,
+          "display": "UserToRecipe.rating"
+        },
+        "is_favorite": {
+          "name": "is_favorite",
+          "kind": "bool",
+          "filterable": false,
+          "display": "UserToRecipe.is_favorite"
+        },
+        "id": {
+          "name": "id",
+          "kind": "uuid",
+          "filterable": false,
+          "display": "UserToRecipe.id"
+        },
+        "created_at": {
+          "name": "created_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "UserToRecipe.created_at"
+        },
+        "update_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "UserToRecipe.update_at"
+        },
+        "updated_at": {
+          "name": "update_at",
+          "kind": "datetime",
+          "filterable": true,
+          "display": "UserToRecipe.updated_at"
+        }
+      },
+      "relations": {
+        "recipe": {
+          "model": "RecipeModel",
+          "join": "{target}.id = {parent}.recipe_id",
+          "secondary": null,
+          "secondaryJoin": null,
+          "display": "UserToRecipe.recipe"
+        }
+      },
+      "proxies": {
+        "group_id": [
+          "recipe",
+          "group_id"
+        ],
+        "household_id": [
+          "recipe",
+          "household_id"
+        ]
+      }
+    }
+  }
+}

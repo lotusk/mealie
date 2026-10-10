@@ -38,6 +38,52 @@ public class RecipeRepository {
                 groupId, locale, new HashSet<>());
     }
 
+    /** Summary projection deliberately does not load ingredients, notes or recursively referenced recipes. */
+    public List<Map<String, Object>> summaries(List<UUID> ids, UUID groupId) {
+        if (ids.isEmpty()) return List.of();
+        var params = new MapSqlParameterSource("ids", ids.stream().map(dialect::uuid).toList())
+                .addValue("groupId", dialect.uuid(groupId));
+        var rows = jdbc.query("SELECT r.*, u.household_id FROM recipes r LEFT JOIN users u ON u.id=r.user_id"
+                + " WHERE r.id IN (:ids) AND r.group_id=:groupId", params,
+                (rs, n) -> project(rs, "id user_id household_id group_id name slug image recipe_servings recipe_yield_quantity recipe_yield total_time prep_time cook_time perform_time total_time_seconds prep_time_seconds perform_time_seconds description rating org_url date_added date_updated created_at update_at last_made"));
+        var categories = summaryOrganizers("categories", "recipes_to_categories", "category_id", params);
+        var tags = summaryOrganizers("tags", "recipes_to_tags", "tag_id", params);
+        var tools = summaryOrganizers("tools", "recipes_to_tools", "tool_id", params);
+        var toolIds = tools.values().stream().flatMap(List::stream).map(tool -> uuid(tool.get("id"))).distinct().toList();
+        var toolHouseholds = new LinkedHashMap<UUID, List<String>>();
+        if (!toolIds.isEmpty()) jdbc.query("SELECT l.tool_id,h.slug FROM households_to_tools l JOIN households h ON h.id=l.household_id WHERE l.tool_id IN (:tools)",
+                new MapSqlParameterSource("tools", toolIds.stream().map(dialect::uuid).toList()),
+                (org.springframework.jdbc.core.RowCallbackHandler) rs -> toolHouseholds.computeIfAbsent(dialect.getUuid(rs, "tool_id"), k -> new java.util.ArrayList<>()).add(rs.getString("slug")));
+        for (var collection : tools.values()) for (var tool : collection)
+            tool.put("householdsWithTool", toolHouseholds.getOrDefault(uuid(tool.get("id")), List.of()));
+        var byId = new LinkedHashMap<UUID, Map<String, Object>>();
+        for (var recipe : rows) {
+            UUID id = uuid(recipe.get("id"));
+            recipe.compute("recipeServings", (k, v) -> v == null ? 0 : v);
+            recipe.compute("recipeYieldQuantity", (k, v) -> v == null ? 0 : v);
+            recipe.put("recipeCategory", categories.getOrDefault(id, List.of()));
+            recipe.put("tags", tags.getOrDefault(id, List.of()));
+            recipe.put("tools", tools.getOrDefault(id, List.of()));
+            // RecipeSummary is dumped by Pydantic directly (+00:00); detail's HTTP JSON encoder uses Z.
+            for (String key : List.of("dateUpdated", "createdAt", "updatedAt", "lastMade"))
+                if (recipe.get(key) instanceof String timestamp && timestamp.endsWith("Z"))
+                    recipe.put(key, timestamp.substring(0, timestamp.length() - 1) + "+00:00");
+            byId.put(id, recipe);
+        }
+        return ids.stream().map(byId::get).filter(java.util.Objects::nonNull).toList();
+    }
+
+    private Map<UUID, List<Map<String, Object>>> summaryOrganizers(String table, String link, String key, MapSqlParameterSource params) {
+        var result = new LinkedHashMap<UUID, List<Map<String, Object>>>();
+        jdbc.query("SELECT o.*,l.recipe_id FROM " + table + " o JOIN " + link + " l ON o.id=l." + key + " WHERE l.recipe_id IN (:ids)",
+                params, (org.springframework.jdbc.core.RowCallbackHandler) rs -> {
+                    var organizer = project(rs, "id group_id name slug");
+                    organizer.put("recipeCount", 0);
+                    result.computeIfAbsent(dialect.getUuid(rs, "recipe_id"), k -> new java.util.ArrayList<>()).add(organizer);
+                });
+        return result;
+    }
+
     private Optional<Map<String, Object>> readRecipe(Object identifier, String column, UUID groupId, String locale, Set<UUID> parents) {
         // Python's RecipeService uses group_recipes, not the household-scoped repo. Admins are also group-scoped here.
         String sql = "SELECT r.*, u.household_id FROM recipes r LEFT JOIN users u ON u.id = r.user_id"
