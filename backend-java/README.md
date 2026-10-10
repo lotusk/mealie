@@ -2,8 +2,9 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). The gateway sends public `GET /api/app/about`, authenticated `GET /api/recipes` listing and
-`GET /api/recipes/{slug}` detail to Java. Detail accepts a recipe slug or UUID. Other application endpoints remain on Python.
+(`JAVA_API_PORT`). The gateway sends the public app-about endpoints, authenticated `GET /api/recipes` listing, and
+`GET /api/recipes/{slug}` detail to Java. Detail accepts a recipe slug or UUID. Other application endpoints remain
+on Python.
 
 ```bash
 task java           # run against the same database as `task py`
