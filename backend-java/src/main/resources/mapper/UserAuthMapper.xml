@@ -20,6 +20,19 @@
         </constructor>
     </resultMap>
 
+    <resultMap id="loginUserRow" type="io.mealie.backend.persistence.model.LoginUserRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="email" javaType="java.lang.String"/>
+            <arg column="password" javaType="java.lang.String"/>
+            <arg column="auth_method" javaType="java.lang.String"/>
+            <arg column="login_attemps" javaType="java.lang.Integer"/>
+            <arg column="locked_at" javaType="java.time.OffsetDateTime"
+                 typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        </constructor>
+    </resultMap>
+
     <sql id="userColumns">
         u.id, u.username, u.group_id, u.household_id, u.admin, u.can_organize, u.tokens_valid_after
     </sql>
@@ -37,4 +50,30 @@
         WHERE t.token = #{token}
           AND t.user_id = #{userId}
     </select>
+
+    <select id="findLoginUserByUsername" resultMap="loginUserRow">
+        SELECT id, email, password, auth_method, login_attemps, locked_at
+        FROM users
+        WHERE LOWER(username) = LOWER(#{username})
+        LIMIT 1
+    </select>
+
+    <select id="findLoginUserByEmail" resultMap="loginUserRow">
+        SELECT id, email, password, auth_method, login_attemps, locked_at
+        FROM users
+        WHERE LOWER(email) = LOWER(#{email})
+        LIMIT 1
+    </select>
+
+    <update id="recordFailedLogin">
+        UPDATE users
+        SET locked_at = CASE WHEN COALESCE(login_attemps, 0) + 1 &gt;= #{maxAttempts}
+                             THEN #{lockedAt} ELSE locked_at END,
+            login_attemps = COALESCE(login_attemps, 0) + 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="resetLoginAttempts">
+        UPDATE users SET login_attemps = 0 WHERE id = #{id}
+    </update>
 </mapper>

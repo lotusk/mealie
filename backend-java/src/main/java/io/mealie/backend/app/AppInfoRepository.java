@@ -27,6 +27,10 @@ public class AppInfoRepository {
         return Optional.ofNullable(mapper.findPublicHouseholdSlug(dialect.uuid(groupId), name));
     }
 
+    public boolean userExistsByEmail(String email) {
+        return mapper.countUsersByEmail(email) > 0;
+    }
+
     public record PublicGroup(UUID id, String slug) {
     }
 }

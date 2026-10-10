@@ -8,4 +8,6 @@ public interface AppInfoMapper {
     PublicGroupRow findPublicGroupByName(@Param("name") String name);
 
     String findPublicHouseholdSlug(@Param("groupId") Object groupId, @Param("name") String name);
+
+    long countUsersByEmail(@Param("email") String email);
 }

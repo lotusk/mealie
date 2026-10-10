@@ -14,8 +14,9 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 public class SecurityConfig {
 
     @Bean
-    AuthenticationManager authenticationManager(MealieAuthenticationProvider provider) {
-        return new ProviderManager(List.of(provider));
+    AuthenticationManager authenticationManager(
+            MealieAuthenticationProvider tokenProvider, PasswordAuthenticationProvider passwordProvider) {
+        return new ProviderManager(List.of(tokenProvider, passwordProvider));
     }
 
     @Bean

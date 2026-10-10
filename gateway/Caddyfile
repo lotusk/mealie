@@ -38,6 +38,42 @@
 	respond /api/internal/* 404
 
 	reverse_proxy /api/app/about {$JAVA_UPSTREAM}
+	reverse_proxy /api/app/about/theme {$JAVA_UPSTREAM}
+	reverse_proxy /api/app/about/startup-info {$JAVA_UPSTREAM}
+
+	# POST only: Python continues to own refresh, logout and OIDC.
+	@authToken {
+		method POST
+		path /api/auth/token
+	}
+	reverse_proxy @authToken {$AUTH_TOKEN_UPSTREAM:host.docker.internal:9100}
+
+	# Exact authenticated profile read; ratings, favorites and writes stay on Python.
+	@userSelf {
+		method GET
+		path /api/users/self
+	}
+	reverse_proxy @userSelf {$JAVA_UPSTREAM}
+
+	# Exact group summary; group members, preferences, settings and writes remain on Python.
+	@groupSelf {
+		method GET
+		path /api/groups/self
+	}
+	reverse_proxy @groupSelf {$JAVA_UPSTREAM}
+
+	# Recipe detail GET and exact listing GET are migrated. Fixed sibling routes and other methods stay on Python.
+	@recipeGet {
+		method GET
+		path_regexp recipeGet ^/api/recipes/[^/]+$
+		not path /api/recipes/suggestions /api/recipes/exports
+	}
+	@recipeList {
+		method GET
+		path /api/recipes
+	}
+	reverse_proxy @recipeList {$JAVA_UPSTREAM}
+	reverse_proxy @recipeGet {$JAVA_UPSTREAM}
 	reverse_proxy /api/organizers/tags* {$JAVA_UPSTREAM}
 	reverse_proxy {$PYTHON_UPSTREAM}
 }

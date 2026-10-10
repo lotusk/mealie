@@ -11,6 +11,7 @@ services:
     environment:
       PYTHON_UPSTREAM: ${PYTHON_UPSTREAM:-host.docker.internal:9000}
       JAVA_UPSTREAM: ${JAVA_UPSTREAM:-host.docker.internal:9100}
+      AUTH_TOKEN_UPSTREAM: ${AUTH_TOKEN_UPSTREAM:-host.docker.internal:9100}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
