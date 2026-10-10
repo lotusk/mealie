@@ -214,3 +214,13 @@ In browser Network, verify that PATCH returns 200 with the full recipe and `X-Me
 timeline POST has `X-Mealie-Backend: python`. Refresh the recipe, then use Recipe Finder's **Last Made** filter to
 check the caller household's date. An older date does not reduce the recipe's overall maximum, and the frontend
 only issues the PATCH when the selected date advances the displayed date.
+
+## Category routing
+
+`@categories` selects the exact `/api/organizers/categories` path and its slash-delimited descendants for every
+method, including Java trailing-slash redirects. The matcher is segment-bounded, so similarly named organizer
+routes remain on Python. To roll back, remove `@categories` and its `reverse_proxy` line from `gateway/Caddyfile`.
+
+The Java implementation reads and writes categories in the shared database. Successful create, update and delete
+events use the signed `/api/internal/events` bridge for Python notification delivery. Merge does not publish an
+event. SQLite/PostgreSQL parity harness coverage and UI smoke testing remain outstanding.

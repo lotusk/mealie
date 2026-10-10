@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.CategoryMapper">
+  <resultMap id="categoryRow" type="io.mealie.backend.persistence.model.CategoryRow">
+    <constructor>
+      <idArg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+      <arg column="group_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+      <arg column="name" javaType="java.lang.String"/><arg column="slug" javaType="java.lang.String"/>
+      <arg column="created_at" javaType="java.time.OffsetDateTime" typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+      <arg column="update_at" javaType="java.time.OffsetDateTime" typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+      <arg column="recipe_count" javaType="_long"/>
+    </constructor>
+  </resultMap>
+  <resultMap id="idRow" type="io.mealie.backend.persistence.model.IdRow"><constructor><idArg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/></constructor></resultMap>
+  <sql id="columns">(SELECT count(recipes_to_categories.recipe_id) FROM recipes_to_categories WHERE recipes_to_categories.category_id=categories.id) AS recipe_count, categories.id,categories.group_id,categories.name,categories.slug,categories.created_at,categories.update_at</sql>
+  <select id="count" resultType="long">SELECT count(*) FROM categories WHERE ${where.sql}</select>
+  <select id="page" resultMap="categoryRow">SELECT <include refid="columns"/> FROM categories WHERE ${where.sql}<if test="order != null and !order.isEmpty()"> ORDER BY ${order.sql}</if><choose><when test="limit != null">LIMIT #{limit}</when><when test="sqlite">LIMIT -1</when></choose> OFFSET #{offset}</select>
+  <select id="ids" resultMap="idRow">SELECT categories.id FROM categories WHERE ${where.sql}<if test="order != null and !order.isEmpty()"> ORDER BY ${order.sql}</if></select>
+  <select id="findById" resultMap="categoryRow">SELECT <include refid="columns"/> FROM categories WHERE group_id=#{groupId} AND id=#{id}</select>
+  <select id="findBySlug" resultMap="categoryRow">SELECT <include refid="columns"/> FROM categories WHERE group_id=#{groupId} AND slug=#{slug}</select>
+  <select id="findEmpty" resultMap="categoryRow">SELECT 0 AS recipe_count,categories.id,categories.group_id,categories.name,categories.slug,categories.created_at,categories.update_at FROM categories WHERE categories.group_id=#{groupId} AND NOT EXISTS (SELECT 1 FROM recipes_to_categories JOIN recipes ON recipes.id=recipes_to_categories.recipe_id WHERE recipes_to_categories.category_id=categories.id)</select>
+  <insert id="insert">INSERT INTO categories(id,group_id,name,slug,created_at,update_at) VALUES(#{id},#{groupId},#{name},#{slug},#{createdAt},#{updateAt})</insert>
+  <update id="update">UPDATE categories SET group_id=#{groupId},name=#{name},slug=#{slug},update_at=#{updateAt} WHERE id=#{id} AND group_id=#{groupId}</update>
+  <delete id="deleteRecipeLinks">DELETE FROM recipes_to_categories WHERE category_id=#{categoryId} AND recipe_id IN (SELECT id FROM recipes)</delete>
+  <delete id="delete">DELETE FROM categories WHERE id=#{id}</delete>
+  <update id="moveRecipeLinks">UPDATE recipes_to_categories SET category_id=#{toId} WHERE category_id=#{fromId} AND recipe_id NOT IN (SELECT recipe_id FROM recipes_to_categories WHERE category_id=#{toId})</update>
+  <delete id="deleteAllRecipeLinks">DELETE FROM recipes_to_categories WHERE category_id=#{categoryId}</delete>
+  <select id="recipeIds" resultMap="idRow">SELECT r.id FROM recipes r JOIN recipes_to_categories l ON l.recipe_id=r.id JOIN users u ON u.id=r.user_id WHERE r.group_id=#{groupId} AND l.category_id=#{categoryId} ORDER BY r.created_at DESC</select>
+</mapper>

@@ -91,6 +91,10 @@
 	}
 	reverse_proxy @recipeList {$JAVA_UPSTREAM}
 	reverse_proxy @recipeGet {$JAVA_UPSTREAM}
+	@categories {
+		path /api/organizers/categories /api/organizers/categories/*
+	}
+	reverse_proxy @categories {$JAVA_UPSTREAM}
 	reverse_proxy /api/organizers/tags* {$JAVA_UPSTREAM}
 	@toolList {
 		method GET
