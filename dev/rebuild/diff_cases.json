@@ -9,6 +9,26 @@
   },
   "cases": [
     {
+      "name": "tools: all, by name",
+      "method": "GET",
+      "path": "/api/organizers/tools?page=1&perPage=-1&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "tools: pagination",
+      "method": "GET",
+      "path": "/api/organizers/tools?page=2&perPage=1&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "tools: search",
+      "method": "GET",
+      "path": "/api/organizers/tools?search=pan&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "tools: invalid query",
+      "method": "GET",
+      "path": "/api/organizers/tools?page=invalid&orderDirection=invalid"
+    },
+    {
       "name": "public app information",
       "method": "GET",
       "path": "/api/app/about"

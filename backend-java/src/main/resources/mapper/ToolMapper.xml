@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.ToolMapper">
+
+    <resultMap id="toolRow" type="io.mealie.backend.persistence.model.ToolRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="group_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="slug" javaType="java.lang.String"/>
+            <arg column="recipe_count" javaType="_long"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="idRow" type="io.mealie.backend.persistence.model.IdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="toolHouseholdRow" type="io.mealie.backend.persistence.model.ToolHouseholdRow">
+        <constructor>
+            <idArg column="tool_id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="slug" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <!-- Only validated SqlFragments are interpolated; all request values remain bound parameters. -->
+    <select id="count" resultType="long">
+        SELECT count(*) FROM tools WHERE ${where.sql}
+    </select>
+
+    <select id="page" resultMap="toolRow">
+        SELECT tools.id, tools.group_id, tools.name, tools.slug,
+               (SELECT count(recipes_to_tools.recipe_id) FROM recipes_to_tools
+                WHERE recipes_to_tools.tool_id = tools.id) AS recipe_count
+        FROM tools
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+        <choose>
+            <when test="limit != null">LIMIT #{limit}</when>
+            <when test="sqlite">LIMIT -1</when>
+        </choose>
+        OFFSET #{offset}
+    </select>
+
+    <select id="ids" resultMap="idRow">
+        SELECT tools.id FROM tools
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+    </select>
+
+    <select id="householdSlugs" resultMap="toolHouseholdRow">
+        SELECT households_to_tools.tool_id, households.slug
+        FROM households, households_to_tools
+        WHERE households.id = households_to_tools.household_id
+          AND households_to_tools.tool_id IN
+        <foreach collection="toolIds" item="id" open="(" separator=", " close=")">
+            #{id, javaType=java.lang.Object}
+        </foreach>
+    </select>
+</mapper>
