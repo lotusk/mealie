@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.GroupSelfMapper">
+
+    <resultMap id="groupSelfRow" type="io.mealie.backend.persistence.model.GroupSelfRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="slug" javaType="java.lang.String"/>
+            <arg column="preferences_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="private_group" javaType="java.lang.Boolean"/>
+            <arg column="show_announcements" javaType="java.lang.Boolean"/>
+            <arg column="ai_settings_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="default_provider_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="audio_provider_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="image_provider_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="groupSelfProviderRow" type="io.mealie.backend.persistence.model.GroupSelfProviderRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <select id="findById" resultMap="groupSelfRow">
+        SELECT g.id, g.name, g.slug,
+               gp.id AS preferences_id, gp.private_group, gp.show_announcements,
+               aps.id AS ai_settings_id, aps.default_provider_id, aps.audio_provider_id, aps.image_provider_id
+        FROM groups g
+        LEFT JOIN group_preferences gp ON gp.group_id = g.id
+        LEFT JOIN ai_provider_settings aps ON aps.group_id = g.id
+        WHERE g.id = #{id}
+    </select>
+
+    <select id="findProviders" resultMap="groupSelfProviderRow">
+        SELECT id, name
+        FROM ai_providers
+        WHERE settings_id = #{settingsId}
+        ORDER BY id
+    </select>
+</mapper>
