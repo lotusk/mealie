@@ -28,4 +28,10 @@
           AND h.name = #{name}
           AND (hp.private_household = FALSE OR hp.private_household IS NULL)
     </select>
+
+    <select id="countUsersByEmail" resultType="long">
+        SELECT COUNT(*)
+        FROM users
+        WHERE email = #{email}
+    </select>
 </mapper>

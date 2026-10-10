@@ -14,6 +14,16 @@
       "path": "/api/app/about"
     },
     {
+      "name": "public app theme",
+      "method": "GET",
+      "path": "/api/app/about/theme"
+    },
+    {
+      "name": "public startup information",
+      "method": "GET",
+      "path": "/api/app/about/startup-info"
+    },
+    {
       "name": "missing recipe slug",
       "method": "GET",
       "path": "/api/recipes/compx574-absent-recipe"

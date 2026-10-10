@@ -51,6 +51,8 @@ class AppInfoIntegrationTest {
         registry.add("OIDC_USER_CLAIM", () -> "email");
         registry.add("OIDC_AUTO_REDIRECT", () -> "true");
         registry.add("OIDC_PROVIDER_NAME", () -> "Test ID");
+        registry.add("THEME_LIGHT_PRIMARY", () -> "#112233");
+        registry.add("THEME_DARK_ACCENT", () -> "#AABBCC");
     }
 
     @BeforeAll
@@ -58,6 +60,7 @@ class AppInfoIntegrationTest {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataDir.resolve("mealie.db"));
                 Statement st = conn.createStatement()) {
             st.executeUpdate("CREATE TABLE groups (id CHAR(32) PRIMARY KEY, name VARCHAR, slug VARCHAR)");
+            st.executeUpdate("CREATE TABLE users (email VARCHAR)");
             st.executeUpdate("""
                     CREATE TABLE group_preferences (
                         id CHAR(32) PRIMARY KEY, group_id CHAR(32), private_group BOOLEAN)
@@ -77,6 +80,7 @@ class AppInfoIntegrationTest {
                     + GROUP_ID + "')");
             st.executeUpdate("INSERT INTO household_preferences VALUES ('00000000000000000000000000000002', '"
                     + HOUSEHOLD_ID + "', 0)");
+            st.executeUpdate("INSERT INTO users VALUES ('changeme@example.com')");
         }
     }
 
@@ -114,6 +118,52 @@ class AppInfoIntegrationTest {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataDir.resolve("mealie.db"));
                 Statement st = conn.createStatement()) {
             st.executeUpdate("UPDATE group_preferences SET private_group = 0");
+        }
+    }
+
+    @Test
+    void returnsTheThemeWithPythonCompatibleCaching() throws Exception {
+        mvc.perform(get("/api/app/about/theme"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "public, max-age=604800"))
+                .andExpect(jsonPath("$.lightPrimary").value("#112233"))
+                .andExpect(jsonPath("$.lightAccent").value("#007A99"))
+                .andExpect(jsonPath("$.lightSecondary").value("#973542"))
+                .andExpect(jsonPath("$.lightSuccess").value("#43A047"))
+                .andExpect(jsonPath("$.lightInfo").value("#1976D2"))
+                .andExpect(jsonPath("$.lightWarning").value("#FF6D00"))
+                .andExpect(jsonPath("$.lightError").value("#EF5350"))
+                .andExpect(jsonPath("$.darkPrimary").value("#E58325"))
+                .andExpect(jsonPath("$.darkAccent").value("#AABBCC"))
+                .andExpect(jsonPath("$.darkSecondary").value("#973542"))
+                .andExpect(jsonPath("$.darkSuccess").value("#43A047"))
+                .andExpect(jsonPath("$.darkInfo").value("#1976D2"))
+                .andExpect(jsonPath("$.darkWarning").value("#FF6D00"))
+                .andExpect(jsonPath("$.darkError").value("#EF5350"));
+    }
+
+    @Test
+    void reportsWhetherTheDefaultUserStillExists() throws Exception {
+        mvc.perform(get("/api/app/about/startup-info"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"))
+                .andExpect(jsonPath("$.isFirstLogin").value(true))
+                .andExpect(jsonPath("$.isDemo").value(true));
+
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataDir.resolve("mealie.db"));
+                Statement st = conn.createStatement()) {
+            st.executeUpdate("DELETE FROM users WHERE email = 'changeme@example.com'");
+        }
+        try {
+            mvc.perform(get("/api/app/about/startup-info"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.isFirstLogin").value(false))
+                    .andExpect(jsonPath("$.isDemo").value(true));
+        } finally {
+            try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dataDir.resolve("mealie.db"));
+                    Statement st = conn.createStatement()) {
+                st.executeUpdate("INSERT INTO users VALUES ('changeme@example.com')");
+            }
         }
     }
 }

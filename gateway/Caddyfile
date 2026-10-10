@@ -35,6 +35,8 @@
 	# ---------------------------------------------------------------------------------------------
 
 	reverse_proxy /api/app/about {$JAVA_UPSTREAM}
+	reverse_proxy /api/app/about/theme {$JAVA_UPSTREAM}
+	reverse_proxy /api/app/about/startup-info {$JAVA_UPSTREAM}
 
 	# Recipe detail GET and exact listing GET are migrated. Fixed sibling routes and other methods stay on Python.
 	@recipeGet {
