@@ -3,7 +3,7 @@
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
 **:8080** sits in front of both and decides, per path, which backend answers. Public `GET /api/app/about`, authenticated
 `GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID), and exact manual `POST /api/recipes`
-go to Java. Local password login and user/group self reads also use Java as configured in the routing table. Other recipe writes and imports remain on Python.
+go to Java, as do the tag and category organizers (`/api/organizers/tags`, `/api/organizers/categories`). Local password login and user/group self reads also use Java as configured in the routing table. Other recipe writes and imports remain on Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐
@@ -150,7 +150,9 @@ Only add **read-only** cases. Both backends write to the same database, so a POS
 
 Write endpoints need a scenario script instead: it runs the same steps against each backend on separate data and
 compares the normalized responses. Tags have one (`task diff:tags-writes`, `dev/rebuild/write_diff_tags.py`), which
-covers creating, updating, merging and deleting, plus permission and validation errors.
+covers creating, updating, merging and deleting, plus permission and validation errors. Categories have one too
+(`task diff:categories-writes`, `dev/rebuild/write_diff_categories.py`), with extra steps for the places where their
+errors differ from tags (404s for unknown ids and slugs, `/empty`).
 
 ## Checking the Java SQL dialect against a real database
 

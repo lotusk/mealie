@@ -472,6 +472,11 @@ tasks:
     cmds:
       - uv run python dev/rebuild/diff_test.py {{ .CLI_ARGS }}
 
+  diff:categories-writes:
+    desc: runs the category write scenario (create/update/merge/delete) on Python and Java and compares every response
+    cmds:
+      - uv run python dev/rebuild/write_diff_categories.py {{ .CLI_ARGS }}
+
   diff:tags-writes:
     desc: runs the tag write scenario (create/update/merge/delete) on Python and Java and compares every response
     cmds:
