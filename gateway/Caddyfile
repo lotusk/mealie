@@ -66,6 +66,13 @@
 	}
 	reverse_proxy @recipeCreate {$JAVA_UPSTREAM}
 
+	# Only the last-made PATCH moves; other recipe writes and timeline APIs stay on Python.
+	@recipeLastMade {
+		method PATCH
+		path_regexp recipeLastMade ^/api/recipes/[^/]+/last-made$
+	}
+	reverse_proxy @recipeLastMade {$JAVA_UPSTREAM}
+
 	# Internal event delivery is accessible only by a direct, signed service call.
 	respond /internal/* 404
 

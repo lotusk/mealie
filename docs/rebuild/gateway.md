@@ -187,3 +187,24 @@ both backend environments and `RECIPE_EVENT_ADAPTER_URL` in Java (default
 `http://localhost:9000/internal/recipe-created`). See `backend-java/README.md` for key setup and isolated tests.
 `X-Mealie-Backend: java`, `JAVA_RECIPE_CREATED` and adapter/event-delivery logs distinguish native creation from
 the retained notification delivery dependency. No frontend or database schema changes are needed.
+
+## Recipe last-made routing
+
+The `@recipeLastMade` matcher selects only method PATCH and
+`^/api/recipes/[^/]+/last-made$`. Other recipe writes, imports, timeline APIs, other methods and trailing-slash
+redirects continue to use Python. The existing detail GET, listing GET and exact creation POST keep their Java
+matchers. To roll back only last-made, remove this matcher and its reverse proxy.
+
+Use `dev/rebuild/recipe_last_made_parity.py` with a built Java artifact and Caddy for isolated SQLite and PostgreSQL
+comparisons. See the [Java last-made instructions](../../backend-java/README.md#recipe-last-made-updates).
+`X-Mealie-Backend: java` and `JAVA_RECIPE_LAST_MADE_UPDATED` identify the native write. The approved signed,
+internal `/internal/recipe-updated` adapter only delivers update notifications and remains hidden by the gateway.
+Java derives its URL from the creation adapter URL, with `RECIPE_UPDATE_EVENT_ADAPTER_URL` as an optional override.
+
+In the unchanged UI, open a recipe and choose **I Made This!** in the **Last Made** area. Select a date later than
+its current value and submit. The frontend first creates a timeline event through Python, then sends the last-made
+PATCH to Java. That timeline event is a separate existing UI action; the PATCH itself does not create one.
+In browser Network, verify that PATCH returns 200 with the full recipe and `X-Mealie-Backend: java`, while the
+timeline POST has `X-Mealie-Backend: python`. Refresh the recipe, then use Recipe Finder's **Last Made** filter to
+check the caller household's date. An older date does not reduce the recipe's overall maximum, and the frontend
+only issues the PATCH when the selected date advances the displayed date.

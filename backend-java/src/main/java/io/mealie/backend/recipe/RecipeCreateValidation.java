@@ -36,6 +36,10 @@ public class RecipeCreateValidation {
     }
 
     RecipeCreateBody parse(HttpServletRequest request) throws IOException {
+        return parse(request, sourceTrace);
+    }
+
+    RecipeCreateBody parse(HttpServletRequest request, String trace) throws IOException {
         byte[] bytes = request.getInputStream().readAllBytes();
         if (bytes.length == 0) return new RecipeCreateBody(null, true);
         String type = request.getContentType();
@@ -52,7 +56,7 @@ public class RecipeCreateValidation {
             throw new RecipeCreateFailure(400, Map.of("detail", "There was an error parsing the body"));
         } catch (PythonJson.Failure e) {
             throw invalid("json_invalid", List.of("body", e.position), "JSON decode error", Map.of(),
-                    Map.of("error", e.getMessage()));
+                    Map.of("error", e.getMessage()), trace);
         }
     }
 
@@ -71,6 +75,11 @@ public class RecipeCreateValidation {
 
     private RecipeCreateFailure invalid(String type, List<Object> location, String message, Object input,
             Map<String, Object> context) {
+        return invalid(type, location, message, input, context, sourceTrace);
+    }
+
+    RecipeCreateFailure invalid(String type, List<Object> location, String message, Object input,
+            Map<String, Object> context, String trace) {
         var error = new LinkedHashMap<String, Object>();
         error.put("type", type);
         error.put("loc", location);
@@ -83,7 +92,7 @@ public class RecipeCreateValidation {
         display.put("input", input);
         var envelope = new LinkedHashMap<String, Object>();
         envelope.put("status_code", 422);
-        envelope.put("message", "1 validation error: " + repr(display) + sourceTrace);
+        envelope.put("message", "1 validation error: " + repr(display) + trace);
         envelope.put("data", null);
         return new RecipeCreateFailure(422, envelope);
     }

@@ -1,4 +1,4 @@
-"""Private delivery adapter for Java-created recipes; it performs no recipe or timeline writes."""
+"""Private delivery adapter for Java recipe writes; it performs no recipe or timeline writes."""
 
 import hashlib
 import hmac
@@ -13,6 +13,7 @@ from uuid import UUID
 from dotenv import dotenv_values
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Request, Response
 from sqlalchemy import select
+from sqlalchemy.orm import aliased
 
 from mealie.core.config import get_app_settings
 from mealie.core.root_logger import get_logger
@@ -46,6 +47,15 @@ def _key() -> str:
 
 @router.post("/internal/recipe-created", status_code=204)
 async def deliver_recipe_created(request: Request, background: BackgroundTasks) -> Response:
+    return await _deliver(request, background, updated=False)
+
+
+@router.post("/internal/recipe-updated", status_code=204)
+async def deliver_recipe_updated(request: Request, background: BackgroundTasks) -> Response:
+    return await _deliver(request, background, updated=True)
+
+
+async def _deliver(request: Request, background: BackgroundTasks, *, updated: bool) -> Response:
     key = _key()
     if len(key.encode()) < 32:
         raise HTTPException(404, "Not Found")
@@ -83,18 +93,24 @@ async def deliver_recipe_created(request: Request, background: BackgroundTasks) 
 
     # Resolve committed names and ownership rather than trusting a caller-supplied name, slug, URL or destination.
     with session_context() as session:
-        row = session.execute(
+        owner = aliased(User)
+        statement = (
             select(RecipeModel.name, RecipeModel.slug, Group.slug)
-            .join(User, RecipeModel.user_id == User.id)
+            .join(owner, RecipeModel.user_id == owner.id)
             .join(Group, RecipeModel.group_id == Group.id)
             .where(
                 RecipeModel.id == recipe_id,
-                RecipeModel.user_id == user_id,
                 RecipeModel.group_id == group_id,
-                User.household_id == household_id,
-                User.group_id == group_id,
+                owner.household_id == household_id,
+                owner.group_id == group_id,
             )
-        ).one_or_none()
+        )
+        if updated:
+            # Last-made permits another household in the same group; delivery still targets the recipe owner.
+            statement = statement.join(User, User.id == user_id).where(User.group_id == group_id)
+        else:
+            statement = statement.where(RecipeModel.user_id == user_id)
+        row = session.execute(statement).one_or_none()
     if row is None:
         raise HTTPException(404, "Recipe event ownership does not match")
     with _lock:
@@ -104,20 +120,24 @@ async def deliver_recipe_created(request: Request, background: BackgroundTasks) 
         if event_id in _seen:
             raise HTTPException(409, "Recipe event already accepted")
         _seen[event_id] = now
+    event_type = EventTypes.recipe_updated if updated else EventTypes.recipe_created
+    operation = EventOperation.update if updated else EventOperation.create
     translator = get_locale_provider(locale)
     message = translator.t(
-        "notifications.generic-created-with-url",
+        "notifications.generic-updated-with-url" if updated else "notifications.generic-created-with-url",
         name=row[0],
         url=urls.recipe_url(row[2], row[1], get_app_settings().BASE_URL),
     )
     event = Event(
-        message=EventBusMessage.from_type(EventTypes.recipe_created, body=message, translator=translator),
-        event_type=EventTypes.recipe_created,
+        message=EventBusMessage.from_type(event_type, body=message, translator=translator),
+        event_type=event_type,
         integration_id=integration_id,
-        document_data=EventRecipeData(operation=EventOperation.create, recipe_slug=row[1]),
+        document_data=EventRecipeData(operation=operation, recipe_slug=row[1]),
     )
     event.event_id, event.timestamp = event_id, event_timestamp
     bus = EventBusService(translator=translator)
     background.add_task(bus._publish_event, event, group_id, household_id)
-    logger.info("RECIPE_CREATED_EVENT_ADAPTER event=%s recipe=%s", event_id, recipe_id)
+    logger.info(
+        "%s_EVENT_ADAPTER event=%s recipe=%s", "RECIPE_UPDATED" if updated else "RECIPE_CREATED", event_id, recipe_id
+    )
     return Response(status_code=204)
