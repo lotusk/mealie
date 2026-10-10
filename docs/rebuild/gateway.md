@@ -1,7 +1,8 @@
 # Migration gateway
 
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
-**:8080** sits in front of both and decides, per path, which backend answers. Today every path goes to Python.
+**:8080** sits in front of both and decides, per path, which backend answers. Public `GET /api/app/about`, authenticated
+`GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID) go to Java; all other application routes go to Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐
@@ -20,7 +21,7 @@ We chose [Caddy](https://caddyserver.com/) 2 (`caddy:2.11.4-alpine`), configured
 - **No restart to switch.** The container runs `caddy run --watch`: saving the Caddyfile reloads it gracefully,
   without dropping in-flight requests. Rolling back means deleting the line.
 - **Visible routing.** Every response carries `X-Mealie-Backend: python|java`, so the browser's network tab or
-  `curl -I` shows which backend served a request.
+  `curl -D -` shows which backend served a request. Use GET when checking a GET-only migration.
 - **Small and embeddable.** It's a single static binary with good proxy defaults (X-Forwarded-*, streaming, WebSockets). That
   matters later, when production (today a single container) needs the gateway in front of two processes.
 
@@ -149,3 +150,26 @@ Only add **read-only** cases. Both backends write to the same database, so a POS
 `task java:test` runs the unit and integration tests on a throwaway SQLite file. `task java:test:db ENGINE=sqlite`
 and `task java:test:db ENGINE=postgres` also check the dialect read-only against the dev database Python created
 (UUIDs, booleans, datetimes, dates, enums). See `backend-java/README.md`.
+
+## Recipe GET routing
+
+The `@recipeGet` matcher combines method GET with exactly one segment below `/api/recipes/` and excludes
+the fixed `suggestions` and `exports` routes. The separate `@recipeList` matcher selects only exact GET /api/recipes.
+Nested routes, creation, edits, deletion, imports, login,
+HEAD and OPTIONS stay on Python. To roll back this endpoint, remove its matcher and corresponding reverse proxy.
+
+Run `dev/rebuild/recipe_get_parity.py` with `--gateway /path/to/caddy` for the actual matcher and both upstreams
+on isolated ports. The matrix covers slug/UUID reads, nested response data, authentication, group/household access,
+locale-dependent displays, unmigrated route boundaries and reads with Python stopped. See
+[Java backend instructions](../../backend-java/README.md#single-recipe-reads) for both database engines.
+
+Run `dev/rebuild/recipe_list_parity.py --gateway /path/to/caddy --report /tmp/list.json` for listing and
+detail regression checks through the actual gateway configuration, using disposable databases. See the
+[listing test instructions](../../backend-java/README.md#recipe-listing) for SQLite and PostgreSQL.
+
+In the UI, open the group home or Recipe Finder at `/g/home/recipes/finder`, search an existing recipe, change
+sorting, and select categories/tags/foods/tools/households or Other Filters. In browser Network, listing and detail
+GET responses should contain `X-Mealie-Backend: java`; filter-option APIs, login and write endpoints remain Python.
+The card list loads 32 recipes per page. With fewer recipes, inspect pagination using the same listing request
+with `perPage=2` in the browser's request editor or DevTools; follow next/previous by adding /api to their paths.
+Do not populate the shared development database just to exercise pagination.

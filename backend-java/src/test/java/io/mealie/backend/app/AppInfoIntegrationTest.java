@@ -2,6 +2,7 @@ package io.mealie.backend.app;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -83,6 +84,7 @@ class AppInfoIntegrationTest {
     void returnsTheSamePublicShapeAndSettingsAsPython() throws Exception {
         mvc.perform(get("/api/app/about"))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"))
                 .andExpect(jsonPath("$.production").value(false))
                 .andExpect(jsonPath("$.version").value("develop"))
                 .andExpect(jsonPath("$.demoStatus").value(true))

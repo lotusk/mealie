@@ -129,6 +129,7 @@ class AuthIntegrationTest {
     void validTokenResolvesTheUser() throws Exception {
         mvc.perform(get("/api/test/whoami").header("Authorization", "Bearer " + userToken(USER_ID)))
                 .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"))
                 .andExpect(jsonPath("$.id").value(USER_ID))
                 .andExpect(jsonPath("$.groupId").value(GROUP_ID))
                 .andExpect(jsonPath("$.admin").value(true));
@@ -167,6 +168,7 @@ class AuthIntegrationTest {
     void missingTokenIsRejectedLikePython() throws Exception {
         mvc.perform(get("/api/test/whoami"))
                 .andExpect(status().isUnauthorized())
+                .andExpect(header().string("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate"))
                 .andExpect(header().string("WWW-Authenticate", "Bearer"))
                 .andExpect(jsonPath("$.detail").value("Could not validate credentials"));
     }
