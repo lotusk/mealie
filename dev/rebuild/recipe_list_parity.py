@@ -5,6 +5,7 @@ import contextlib
 import json
 import os
 import signal
+import socket
 import sqlite3
 import subprocess
 import tempfile
@@ -29,8 +30,19 @@ def main() -> None:  # noqa: C901 - one resource lifecycle guarantees cleanup of
     parser.add_argument("--baseline-only", action="store_true")
     parser.add_argument("--postgres-database", default="compx574_recipe_list_002")
     parser.add_argument("--gateway", type=Path)
+    parser.add_argument("--port-offset", type=int, default=0, help="Offset the isolated HTTP ports from 9200/9210/9280")
     parser.add_argument("--report", required=True, type=Path)
     args = parser.parse_args()
+    python_port, java_port, gateway_port = (port + args.port_offset for port in (9200, 9210, 9280))
+    for port in (python_port, java_port, gateway_port) if args.gateway else (python_port, java_port):
+        if not 1024 <= port <= 65535:
+            parser.error("Isolated HTTP ports must be between 1024 and 65535")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+            listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                listener.bind(("127.0.0.1", port))
+            except OSError:
+                parser.error(f"Port {port} is already in use; choose another --port-offset before seeding fixtures")
     assert args.postgres_database == "compx574_recipe_list_002" or args.postgres_database.startswith(
         "compx574_recipe_list_002_"
     ), "Refusing non-experiment database name"
@@ -45,7 +57,9 @@ def main() -> None:  # noqa: C901 - one resource lifecycle guarantees cleanup of
             "Compare all fields and recipe item order. Organizer arrays (recipeCategory/tags/tools/householdsWithTool) "
             "are unordered associations: Python declares no ordering for these relationships. Compare their complete "
             "values as sets only; retain raw responses. Compare redirect paths after removing each server origin. "
-            "Sort/search cases request name:asc as a secondary sort to make tied pages deterministic."
+            "Sort/search cases request name:asc as a secondary sort to make tied pages deterministic. "
+            "Record Spring Security's additional default no-cache header when Python omits Cache-Control; "
+            "explicit Python cache policies must still match exactly."
         ),
     }
     processes: list[subprocess.Popen] = []
@@ -58,8 +72,8 @@ def main() -> None:  # noqa: C901 - one resource lifecycle guarantees cleanup of
         "PRODUCTION": "false",
         "TESTING": "true",
         "DATA_DIR": str(data),
-        "API_PORT": "9200",
-        "JAVA_API_PORT": "9210",
+        "API_PORT": str(python_port),
+        "JAVA_API_PORT": str(java_port),
         "DB_ENGINE": args.engine,
         "ALLOW_SIGNUP": "false",
     }
@@ -90,7 +104,7 @@ def main() -> None:  # noqa: C901 - one resource lifecycle guarantees cleanup of
         "shared_development_database_used": False,
         "database": str(data / "mealie.db") if args.engine == "sqlite" else args.postgres_database,
     }
-    python, java, gateway = "http://localhost:9200", "http://localhost:9210", "http://localhost:9280"
+    python, java, gateway = (f"http://localhost:{port}" for port in (python_port, java_port, gateway_port))
 
     def start(name: str, command: list[str], service_env: dict[str, str] = env) -> subprocess.Popen:
         log = args.report.with_suffix("." + name + ".log").open("w")
@@ -190,6 +204,15 @@ def main() -> None:  # noqa: C901 - one resource lifecycle guarantees cleanup of
             ):
                 entry["failures"].append(target + " status/body differs")
             for key in ("www-authenticate", "last-modified", "cache-control", "location"):
+                if (
+                    key == "cache-control"
+                    and key not in entry["python"]["headers"]
+                    and actual["headers"].get(key) == "no-cache, no-store, max-age=0, must-revalidate"
+                ):
+                    entry.setdefault("accepted_differences", {}).setdefault(target, []).append(
+                        "Spring Security adds its default no-cache policy where Python has no Cache-Control header"
+                    )
+                    continue
                 if (
                     urlsplit(actual["headers"].get(key, "")).path if key == "location" else actual["headers"].get(key)
                 ) != (
@@ -350,13 +373,19 @@ def main() -> None:  # noqa: C901 - one resource lifecycle guarantees cleanup of
             report["java_health"] = wait(java + "/api/java/health", jp)
             if args.gateway:
                 config = data / "Caddyfile"
-                config.write_text((REPO / "gateway/Caddyfile").read_text().replace(":8080 {", ":9280 {"))
+                config.write_text((REPO / "gateway/Caddyfile").read_text().replace(":8080 {", f":{gateway_port} {{"))
                 gw = start(
                     "gateway",
                     [str(args.gateway), "run", "--config", str(config), "--adapter", "caddyfile"],
-                    {**env, "PYTHON_UPSTREAM": "localhost:9200", "JAVA_UPSTREAM": "localhost:9210"},
+                    {**env, "PYTHON_UPSTREAM": f"localhost:{python_port}", "JAVA_UPSTREAM": f"localhost:{java_port}"},
                 )
                 wait(gateway + "/api/app/about", gw)
+        for name, token in (
+            ("public app information", None),
+            ("public app information with invalid bearer", "invalid"),
+            ("public app information with valid bearer", root_token),
+        ):
+            probe(name, token=token, path="/api/app/about", expected=200)
         listing = probe("default listing", token=root_token, expected=200)
         assert listing["total"] == 12, "Group-scoped listing baseline changed"
         assert foreign_recipe["id"] not in [item["id"] for item in listing["items"]]

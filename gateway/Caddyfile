@@ -34,6 +34,8 @@
 	# for it that points at {$PYTHON_UPSTREAM}.
 	# ---------------------------------------------------------------------------------------------
 
+	reverse_proxy /api/app/about {$JAVA_UPSTREAM}
+
 	# Recipe detail GET and exact listing GET are migrated. Fixed sibling routes and other methods stay on Python.
 	@recipeGet {
 		method GET

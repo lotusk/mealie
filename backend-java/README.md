@@ -2,8 +2,8 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). Authenticated `GET /api/recipes` listing and `GET /api/recipes/{slug}` detail now run here. Detail accepts a recipe
-slug or UUID. Other application endpoints remain on Python.
+(`JAVA_API_PORT`). The gateway sends public `GET /api/app/about`, authenticated `GET /api/recipes` listing and
+`GET /api/recipes/{slug}` detail to Java. Detail accepts a recipe slug or UUID. Other application endpoints remain on Python.
 
 ```bash
 task java           # run against the same database as `task py`
@@ -15,8 +15,10 @@ The build uses the Maven wrapper (`./mvnw`); the only prerequisite is a JDK 21.
 
 ## Database access
 
-The database layer is Spring JDBC (`JdbcTemplate` / `NamedParameterJdbcTemplate`) with plain SQL, with no JPA or
-Hibernate. The rules:
+The shared database layer uses MyBatis-Plus with mapper interfaces in `persistence/mapper/` and SQL XML files in
+`src/main/resources/mapper/`. Repositories convert mapper projections into domain records. The migrated recipe reads
+use Spring JDBC with bound SQL for their nested projections and dynamic filters. Both approaches use the same
+configured database and SQL dialect. There is no JPA or Hibernate. The rules:
 
 - **The schema belongs to Python/Alembic.** Java never runs DDL. `spring.sql.init.mode=never`, and SQLite is opened
   without the CREATE flag, so a missing database file is an error, not a new empty DB.
@@ -34,12 +36,8 @@ Hibernate. The rules:
   | NaiveDateTime (UTC)    | `timestamp without time zone`| TEXT `YYYY-MM-DD HH:MM:SS.ffffff`         |
   | Date                   | `date`                       | TEXT `YYYY-MM-DD`                         |
 
-  ```java
-  jdbc.query("SELECT id, admin, created_at FROM users WHERE group_id = :groupId",
-          new MapSqlParameterSource("groupId", dialect.uuid(groupId)),
-          (rs, i) -> new Row(dialect.getUuid(rs, "id"), dialect.getBool(rs, "admin"),
-                  dialect.getTimestamp(rs, "created_at")));
-  ```
+  Mapper parameters that refer to existing UUID columns must pass through `dialect.uuid(...)`. XML result maps use
+  the shared UUID and timestamp type handlers for values read from either engine.
 
   Always bind values as parameters. Never put a UUID or boolean literal into SQL text. SQLite compares datetimes as
   strings, so they must be written in exactly SQLAlchemy's format, which `dialect.timestamp()` does.
@@ -52,7 +50,10 @@ Hibernate. The rules:
 
 ## Auth
 
-`auth/AuthService` verifies Mealie's HS256 JWTs exactly like `get_current_user()` in
+Spring Security owns the authentication flow. `MealieAuthenticationFilter` extracts credentials,
+`MealieAuthenticationProvider` delegates Mealie-compatible JWT validation to `auth/AuthService`, and the resulting
+`AuthUser` principal is stored in the `SecurityContext`. `auth/AuthService` verifies Mealie's HS256 JWTs exactly like
+`get_current_user()` in
 `mealie/core/dependencies/dependencies.py`:
 
 - The token comes from `Authorization: Bearer`, with the `mealie.access_token` cookie as fallback.
@@ -64,7 +65,9 @@ The secret is `<DATA_DIR>/.secret` in production, and `shh-secret-test-key` when
 It's read-only from Java and reloaded if the file changes. Errors use Python's body shape, `{"detail": ...}`, with
 the same status codes and headers.
 
-To require a user in a controller, declare a parameter: `public Foo get(AuthUser user)`.
+To require a user in a migrated controller, declare a parameter: `public Foo get(AuthUser user)`. The MVC bridge reads
+that principal from Spring Security rather than authenticating the request itself. Public routes remain public even if
+they receive bad credentials; a protected controller rejects them when it requests the current user.
 
 ## Single-recipe reads
 
@@ -122,12 +125,17 @@ compx574_recipe_list_002_. The test server is localhost:55432, with disposable t
 The harness refuses a non-experiment database name or a database that already has tables. SQLite uses a new
 temporary directory. All fixtures, including token revocation tests, are confined to these databases. Nothing is
 created or removed in the shared development database. Use --baseline-only to capture Python without starting Java.
+If the default isolated ports (9200/9210/9280) are occupied, use `--port-offset 200` to select 9400/9410/9480.
+The harness checks port availability before seeding fixtures, so it cannot accidentally test an older preview server.
 
 The harness records full raw responses, failures and service logs. Recipe item order is compared exactly; sort/search
 cases add the supported name secondary sort for tied values. Category/tag/tool associations have no declared Python
 ordering, so their complete values are compared without relying on incidental SQL order. Redirect paths are compared
 after removing each isolated server's origin. Tests also follow pagination links, check authentication and group
 access, exercise detail reads, verify unmigrated gateway boundaries and stop Python to prove Java independence.
+Spring Security retains its default no-cache response header where Python does not set a cache policy. The parity
+harness records this additional protection explicitly; any cache policy set by Python, including detail reads,
+still has to match exactly.
 
 Search uses the unchanged text-unidecode 1.3 translation table from the Python dependency; the original Artistic
 Licence is included beside the table. This is data consumed by Java, with no Python process or HTTP forwarding.

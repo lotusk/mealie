@@ -1,8 +1,8 @@
 # Migration gateway
 
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
-**:8080** sits in front of both and decides, per path, which backend answers. Authenticated `GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID) go to Java;
-all other application routes go to Python.
+**:8080** sits in front of both and decides, per path, which backend answers. Public `GET /api/app/about`, authenticated
+`GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID) go to Java; all other application routes go to Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐

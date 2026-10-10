@@ -1,7 +1,10 @@
 package io.mealie.backend.auth;
 
+import io.mealie.backend.web.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -10,16 +13,11 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 /**
  * Lets a controller require auth by declaring an {@link AuthUser} parameter, the way Python routes declare
- * {@code Depends(get_current_user)}. A missing or invalid token produces the same 401 as Python.
+ * {@code Depends(get_current_user)}. Authentication itself is performed by Spring Security; this resolver only
+ * exposes its principal to migrated controllers and preserves Python's 401 response shape.
  */
 @Component
 public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
-
-    private final AuthService authService;
-
-    public AuthUserArgumentResolver(AuthService authService) {
-        this.authService = authService;
-    }
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -30,6 +28,16 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
     public AuthUser resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
         HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        return authService.authenticate(AuthTokens.extract(request).orElse(""));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()
+                && authentication.getPrincipal() instanceof AuthUser user) {
+            return user;
+        }
+
+        RuntimeException failure = MealieAuthenticationFilter.failure(request);
+        if (failure instanceof ApiException apiException) {
+            throw apiException;
+        }
+        throw AuthService.credentialsException();
     }
 }

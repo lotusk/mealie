@@ -9,6 +9,11 @@
   },
   "cases": [
     {
+      "name": "public app information",
+      "method": "GET",
+      "path": "/api/app/about"
+    },
+    {
       "name": "missing recipe slug",
       "method": "GET",
       "path": "/api/recipes/compx574-absent-recipe"

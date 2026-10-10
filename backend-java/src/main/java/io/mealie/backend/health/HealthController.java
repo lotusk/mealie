@@ -1,8 +1,12 @@
 package io.mealie.backend.health;
 
 import io.mealie.backend.auth.AuthTokens;
+import io.mealie.backend.auth.AuthUser;
+import io.mealie.backend.auth.MealieAuthenticationFilter;
 import io.mealie.backend.health.HealthService.Health;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +27,12 @@ public class HealthController {
 
     @GetMapping("/api/java/health")
     ResponseEntity<Health> health(HttpServletRequest request) {
-        Health health = healthService.check(AuthTokens.extract(request));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        AuthUser user = authentication != null && authentication.getPrincipal() instanceof AuthUser principal
+                ? principal
+                : null;
+        Health health = healthService.check(
+                AuthTokens.extract(request).isPresent(), user, MealieAuthenticationFilter.failure(request));
         HttpStatus status = health.database().connected() ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
         return ResponseEntity.status(status).body(health);
     }

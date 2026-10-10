@@ -10,6 +10,7 @@ import contextlib
 import json
 import os
 import signal
+import socket
 import sqlite3
 import subprocess
 import tempfile
@@ -110,6 +111,15 @@ def compare_case(
         if response.status_code != oracle.status_code or actual_body != expected_body:
             failures.append(f"{target} status/body differs")
         for key in ("last-modified", "cache-control", "www-authenticate"):
+            if (
+                key == "cache-control"
+                and key not in entry["python"]["headers"]
+                and actual["headers"].get(key) == "no-cache, no-store, max-age=0, must-revalidate"
+            ):
+                entry.setdefault("accepted_differences", {}).setdefault(target, []).append(
+                    "Spring Security adds its default no-cache policy where Python has no Cache-Control header"
+                )
+                continue
             if actual["headers"].get(key) != entry["python"]["headers"].get(key):
                 failures.append(f"{target} {key} differs")
         if target == "gateway" and actual["headers"].get("x-mealie-backend") != backend:
@@ -126,14 +136,29 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--engine", choices=["sqlite", "postgres"], default="sqlite")
     parser.add_argument("--gateway", type=Path, help="Path to a Caddy binary; also test gateway routing")
+    parser.add_argument("--port-offset", type=int, default=0, help="Offset the isolated HTTP ports from 9200/9210/9280")
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
+    python_port, java_port, gateway_port = (port + args.port_offset for port in (9200, 9210, 9280))
+    for port in (python_port, java_port, gateway_port) if args.gateway else (python_port, java_port):
+        if not 1024 <= port <= 65535:
+            parser.error("Isolated HTTP ports must be between 1024 and 65535")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as listener:
+            listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            try:
+                listener.bind(("127.0.0.1", port))
+            except OSError:
+                parser.error(f"Port {port} is already in use; choose another --port-offset before seeding fixtures")
     args.report.parent.mkdir(parents=True, exist_ok=True)
     report = {
         "started_at_utc": datetime.now(UTC).isoformat(),
         "engine": args.engine,
         "cases": [],
         "result": "in_progress",
+        "comparison_policy": (
+            "Compare complete bodies, statuses and explicit Python cache policies. Record Spring Security's "
+            "additional default no-cache policy only where Python omits Cache-Control."
+        ),
     }
     processes = []
     logs = []
@@ -145,8 +170,8 @@ def main() -> None:
         "PRODUCTION": "false",
         "TESTING": "true",
         "DATA_DIR": str(data),
-        "API_PORT": "9200",
-        "JAVA_API_PORT": "9210",
+        "API_PORT": str(python_port),
+        "JAVA_API_PORT": str(java_port),
         "DB_ENGINE": args.engine,
         "BASE_URL": "http://localhost:3000",
         "ALLOW_SIGNUP": "false",
@@ -176,9 +201,9 @@ def main() -> None:
         processes.append(process)
         return process
 
-    python = "http://localhost:9200"
-    java = "http://localhost:9210"
-    gateway = "http://localhost:9280"
+    python = f"http://localhost:{python_port}"
+    java = f"http://localhost:{java_port}"
+    gateway = f"http://localhost:{gateway_port}"
 
     def api(method: str, path: str, token: str | None = None, body: Any = None) -> Any:
         response = requests.request(
@@ -360,8 +385,14 @@ def main() -> None:
         report["java_command"] = ["java", "-jar", "backend-java/target/mealie-backend-0.0.1-SNAPSHOT.jar"]
         if args.gateway:
             gateway_config = data / "Caddyfile"
-            gateway_config.write_text((REPO / "gateway/Caddyfile").read_text().replace(":8080 {", ":9280 {"))
-            caddy_env = {**env, "PYTHON_UPSTREAM": "localhost:9200", "JAVA_UPSTREAM": "localhost:9210"}
+            gateway_config.write_text(
+                (REPO / "gateway/Caddyfile").read_text().replace(":8080 {", f":{gateway_port} {{")
+            )
+            caddy_env = {
+                **env,
+                "PYTHON_UPSTREAM": f"localhost:{python_port}",
+                "JAVA_UPSTREAM": f"localhost:{java_port}",
+            }
             caddy = start(
                 "gateway",
                 [str(args.gateway), "run", "--config", str(gateway_config), "--adapter", "caddyfile"],
