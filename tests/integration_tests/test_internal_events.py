@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from mealie.core.config import get_app_settings
 from mealie.routes.internal.controller_events import SIGNATURE_HEADER, signature_for
 from mealie.services.event_bus_service.event_bus_service import EventBusService
-from mealie.services.event_bus_service.event_types import EventTagData, EventTypes
+from mealie.services.event_bus_service.event_types import EventCategoryData, EventTagData, EventTypes
 from tests.utils.fixture_schemas import TestUser
 
 ROUTE = "/api/internal/events"
@@ -63,6 +63,30 @@ def test_signed_event_is_dispatched_like_a_python_event(
     assert str(call["document_data"].tag_id) == event["documentData"]["tagId"]
     assert call["message"].startswith("Dessert has been created, ")
     assert call["message"].endswith("/recipes/tags/dessert")
+
+
+def test_signed_category_event_is_dispatched_like_a_python_event(
+    api_client: TestClient, unique_user: TestUser, dispatched: list[dict]
+):
+    event = tag_event(
+        str(unique_user.group_id),
+        eventType="category_created",
+        documentData={"documentType": "category", "operation": "create", "categoryId": str(uuid4())},
+        message={
+            "key": "notifications.generic-created-with-url",
+            "params": {"name": "Dessert"},
+            "url": {"type": "category", "slug": "dessert"},
+        },
+    )
+    response = post(api_client, event)
+
+    assert response.status_code == 202
+    assert len(dispatched) == 1
+    call = dispatched[0]
+    assert call["event_type"] is EventTypes.category_created
+    assert isinstance(call["document_data"], EventCategoryData)
+    assert str(call["document_data"].category_id) == event["documentData"]["categoryId"]
+    assert call["message"].endswith("/recipes/categories/dessert")
 
 
 @pytest.mark.parametrize("signature", ["", "0" * 64])

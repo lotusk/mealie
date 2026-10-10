@@ -20,7 +20,12 @@ from mealie.lang.providers import Translator, get_locale_provider
 from mealie.schema._mealie import MealieModel
 from mealie.services import urls
 from mealie.services.event_bus_service.event_bus_service import EventBusService
-from mealie.services.event_bus_service.event_types import EventDocumentDataBase, EventTagData, EventTypes
+from mealie.services.event_bus_service.event_types import (
+    EventCategoryData,
+    EventDocumentDataBase,
+    EventTagData,
+    EventTypes,
+)
 
 router = APIRouter(prefix="/events")
 
@@ -31,9 +36,11 @@ MAX_CLOCK_SKEW = timedelta(minutes=5)
 # The events Java may publish, keyed by document type. Extend as routes migrate.
 DOCUMENT_TYPES: dict[str, type[EventDocumentDataBase]] = {
     "tag": EventTagData,
+    "category": EventCategoryData,
 }
 URL_BUILDERS: dict[str, Callable[[str, str | None], str]] = {
     "tag": urls.tag_url,
+    "category": urls.category_url,
 }
 
 

@@ -392,6 +392,341 @@
       "name": "recipe listing pagination and sorting",
       "method": "GET",
       "path": "/api/recipes?perPage=2&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "categories: default list",
+      "method": "GET",
+      "path": "/api/organizers/categories"
+    },
+    {
+      "name": "categories: all, by name",
+      "method": "GET",
+      "path": "/api/organizers/categories?perPage=-1&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "categories: page 2 of 1",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=2&perPage=1&orderBy=name&orderDirection=asc"
+    },
+    {
+      "name": "categories: last page",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=-1&perPage=2"
+    },
+    {
+      "name": "categories: page 0",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=0&perPage=2"
+    },
+    {
+      "name": "categories: perPage 0",
+      "method": "GET",
+      "path": "/api/organizers/categories?perPage=0"
+    },
+    {
+      "name": "categories: perPage -2",
+      "method": "GET",
+      "path": "/api/organizers/categories?perPage=-2"
+    },
+    {
+      "name": "categories: page past end",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=9&perPage=2"
+    },
+    {
+      "name": "categories: duplicate params, last wins",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=2&page=1&perPage=1"
+    },
+    {
+      "name": "categories: int forms",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=%201%20&perPage=1.0"
+    },
+    {
+      "name": "categories: multi order, nulls",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=name%3Aasc%2Cslug%3Adesc&orderByNullPosition=last"
+    },
+    {
+      "name": "categories: order by updatedAt",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=updatedAt&orderDirection=asc"
+    },
+    {
+      "name": "categories: order by recipe name",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=recipes.name&orderDirection=asc"
+    },
+    {
+      "name": "categories: order by group",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=group.name"
+    },
+    {
+      "name": "categories: random",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=random&paginationSeed=abc&perPage=-1"
+    },
+    {
+      "name": "categories: random other seed",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=random&paginationSeed=seed+2&perPage=2&page=2"
+    },
+    {
+      "name": "categories: random w/o seed",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=random"
+    },
+    {
+      "name": "categories: empty orderBy",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy="
+    },
+    {
+      "name": "categories: search",
+      "method": "GET",
+      "path": "/api/organizers/categories?search=des"
+    },
+    {
+      "name": "categories: search words",
+      "method": "GET",
+      "path": "/api/organizers/categories?search=spicy+cafe"
+    },
+    {
+      "name": "categories: search quoted",
+      "method": "GET",
+      "path": "/api/organizers/categories?search=%22Spicy+Food%22"
+    },
+    {
+      "name": "categories: search punctuation only",
+      "method": "GET",
+      "path": "/api/organizers/categories?search=%21%21%21"
+    },
+    {
+      "name": "categories: search + order",
+      "method": "GET",
+      "path": "/api/organizers/categories?search=e&orderBy=name"
+    },
+    {
+      "name": "categories: filter like",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+LIKE+%22%25ess%25%22"
+    },
+    {
+      "name": "categories: filter not like",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+NOT+LIKE+%22%25ess%25%22"
+    },
+    {
+      "name": "categories: filter in",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=slug+IN+%5Bdesserts%2C+spicy-food%5D&orderBy=slug"
+    },
+    {
+      "name": "categories: filter not in",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=slug+NOT+IN+%5Bdesserts%5D"
+    },
+    {
+      "name": "categories: filter eq case",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+%3D+%22DESSERTS%22"
+    },
+    {
+      "name": "categories: filter and/or",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+%3D+desserts+OR+slug+%3D+spicy-food+AND+name+%3C%3E+x"
+    },
+    {
+      "name": "categories: filter groups",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=%28name+%3D+desserts+OR+slug+%3D+spicy-food%29+AND+createdAt+%3E+2020-01-01"
+    },
+    {
+      "name": "categories: filter now",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=createdAt+%3C+%24NOW%2B1d"
+    },
+    {
+      "name": "categories: filter recipes is null",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.name+IS+NULL"
+    },
+    {
+      "name": "categories: filter recipes like",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.name+LIKE+%22%25cake%25%22"
+    },
+    {
+      "name": "categories: filter recipes contains all",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.slug+CONTAINS+ALL+%5Bchocolate-cake%2C+lemon-tart%5D"
+    },
+    {
+      "name": "categories: filter recipes not in",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.slug+NOT+IN+%5Blemon-tart%5D"
+    },
+    {
+      "name": "categories: filter group name",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=group.name+%3D+home"
+    },
+    {
+      "name": "categories: filter recipe user",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.user.username+%3D+changeme"
+    },
+    {
+      "name": "categories: filter recipe household proxy",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.householdId+IS+NOT+NULL"
+    },
+    {
+      "name": "categories: filter nested categories",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes.recipeCategory.slug+%3D+umlaut-cafe-bar"
+    },
+    {
+      "name": "categories: filter id",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=id+%3D+bf4455d3-c2fb-41ee-8de7-8251415fbb81"
+    },
+    {
+      "name": "categories: filter trailing AND",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+%3D+x+AND"
+    },
+    {
+      "name": "err: unknown attr",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=foo+%3D+1"
+    },
+    {
+      "name": "err: relationship attr",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipes+%3D+1"
+    },
+    {
+      "name": "err: non-filterable",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=recipeCount+%3D+1"
+    },
+    {
+      "name": "err: unbalanced",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=%28name+%3D+x"
+    },
+    {
+      "name": "err: IN without list",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+IN+x"
+    },
+    {
+      "name": "err: IS not null",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+IS+x"
+    },
+    {
+      "name": "err: like on uuid",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=id+LIKE+%22x%22"
+    },
+    {
+      "name": "err: bad uuid",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=id+%3D+nope"
+    },
+    {
+      "name": "err: bad date",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=createdAt+%3E+notadate"
+    },
+    {
+      "name": "err: bad now",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=createdAt+%3E+%24NOW%2B5x"
+    },
+    {
+      "name": "err: dangling op",
+      "method": "GET",
+      "path": "/api/organizers/categories?queryFilter=name+%3D"
+    },
+    {
+      "name": "err: bad orderBy",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=foo"
+    },
+    {
+      "name": "err: orderBy relationship",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=recipes"
+    },
+    {
+      "name": "err: orderBy bad dir",
+      "method": "GET",
+      "path": "/api/organizers/categories?orderBy=name%3Aup"
+    },
+    {
+      "name": "err: 422 query",
+      "method": "GET",
+      "path": "/api/organizers/categories?page=abc&perPage=x&orderDirection=up&orderByNullPosition=mid"
+    },
+    {
+      "name": "categories: empty",
+      "method": "GET",
+      "path": "/api/organizers/categories/empty"
+    },
+    {
+      "name": "categories: by id",
+      "method": "GET",
+      "path": "/api/organizers/categories/bf4455d3-c2fb-41ee-8de7-8251415fbb81"
+    },
+    {
+      "name": "err: id not found",
+      "method": "GET",
+      "path": "/api/organizers/categories/a1b2c3d4-0000-4000-8000-000000000000"
+    },
+    {
+      "name": "err: id invalid",
+      "method": "GET",
+      "path": "/api/organizers/categories/notauuid"
+    },
+    {
+      "name": "err: id short",
+      "method": "GET",
+      "path": "/api/organizers/categories/bad"
+    },
+    {
+      "name": "err: id v1",
+      "method": "GET",
+      "path": "/api/organizers/categories/29bf7010-a6ba-1881-9607-9c57b83d41ea"
+    },
+    {
+      "name": "categories: by slug",
+      "method": "GET",
+      "path": "/api/organizers/categories/slug/desserts"
+    },
+    {
+      "name": "categories: by slug 2",
+      "method": "GET",
+      "path": "/api/organizers/categories/slug/umlaut-cafe-bar"
+    },
+    {
+      "name": "categories: by slug 3",
+      "method": "GET",
+      "path": "/api/organizers/categories/slug/probe-b"
+    },
+    {
+      "name": "err: slug missing",
+      "method": "GET",
+      "path": "/api/organizers/categories/slug/nope"
+    },
+    {
+      "name": "err: GET merge",
+      "method": "GET",
+      "path": "/api/organizers/categories/merge"
     }
   ]
 }

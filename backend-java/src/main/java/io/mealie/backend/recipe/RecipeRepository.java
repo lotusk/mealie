@@ -40,6 +40,15 @@ public class RecipeRepository {
 
     /** Summary projection deliberately does not load ingredients, notes or recursively referenced recipes. */
     public List<Map<String, Object>> summaries(List<UUID> ids, UUID groupId) {
+        return summaries(ids, groupId, true);
+    }
+
+    /** For responses FastAPI serialises with jsonable_encoder (no response model): timestamps keep the Z suffix. */
+    public List<Map<String, Object>> jsonableSummaries(List<UUID> ids, UUID groupId) {
+        return summaries(ids, groupId, false);
+    }
+
+    private List<Map<String, Object>> summaries(List<UUID> ids, UUID groupId, boolean pydanticOffset) {
         if (ids.isEmpty()) return List.of();
         var params = new MapSqlParameterSource("ids", ids.stream().map(dialect::uuid).toList())
                 .addValue("groupId", dialect.uuid(groupId));
@@ -65,7 +74,7 @@ public class RecipeRepository {
             recipe.put("tags", tags.getOrDefault(id, List.of()));
             recipe.put("tools", tools.getOrDefault(id, List.of()));
             // RecipeSummary is dumped by Pydantic directly (+00:00); detail's HTTP JSON encoder uses Z.
-            for (String key : List.of("dateUpdated", "createdAt", "updatedAt", "lastMade"))
+            if (pydanticOffset) for (String key : List.of("dateUpdated", "createdAt", "updatedAt", "lastMade"))
                 if (recipe.get(key) instanceof String timestamp && timestamp.endsWith("Z"))
                     recipe.put(key, timestamp.substring(0, timestamp.length() - 1) + "+00:00");
             byId.put(id, recipe);
