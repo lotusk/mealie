@@ -13,6 +13,14 @@ task java:test:db ENGINE=sqlite|postgres   # read-only dialect checks against th
 
 The build uses the Maven wrapper (`./mvnw`); the only prerequisite is a JDK 21.
 
+Every request handled by a Java controller writes an access marker to the Java log, for example:
+
+```text
+JAVA_BACKEND_ACCESS time=14:32:08 method=GET path=/api/app/about
+```
+
+This complements the gateway's `X-Mealie-Backend` response header when checking whether a route has moved to Java.
+
 ## Database access
 
 The shared database layer uses MyBatis-Plus with mapper interfaces in `persistence/mapper/` and SQL XML files in
