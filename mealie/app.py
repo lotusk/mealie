@@ -24,6 +24,7 @@ from mealie.middleware.locale_context import LocaleContextMiddleware
 from mealie.routes import router, spa, utility_routes
 from mealie.routes.handlers import register_debug_handler
 from mealie.routes.media import media_router
+from mealie.services.event_bus_service.recipe_event_adapter import router as recipe_event_adapter_router
 from mealie.services.scheduler import SchedulerRegistry, SchedulerService, tasks
 
 settings = get_app_settings()
@@ -148,6 +149,7 @@ def api_routers():
     app.include_router(router)
     app.include_router(media_router)
     app.include_router(utility_routes.router)
+    app.include_router(recipe_event_adapter_router)
 
     if settings.PRODUCTION and not settings.TESTING:
         spa.mount_spa(app)

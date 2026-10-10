@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.RecipeCreateMapper">
+    <resultMap id="contextRow" type="io.mealie.backend.persistence.model.RecipeCreationContextRow">
+        <constructor>
+            <arg column="household_id" javaType="java.lang.String"/>
+            <arg column="preferences_id" javaType="java.lang.String"/>
+            <arg column="recipe_public" javaType="java.lang.Boolean"/>
+            <arg column="recipe_show_nutrition" javaType="java.lang.Boolean"/>
+            <arg column="recipe_show_assets" javaType="java.lang.Boolean"/>
+            <arg column="recipe_landscape_view" javaType="java.lang.Boolean"/>
+            <arg column="recipe_disable_comments" javaType="java.lang.Boolean"/>
+        </constructor>
+    </resultMap>
+    <select id="context" resultMap="contextRow">
+        SELECT h.id AS household_id, p.id AS preferences_id, p.recipe_public, p.recipe_show_nutrition, p.recipe_show_assets,
+               p.recipe_landscape_view, p.recipe_disable_comments
+        FROM users u JOIN households h ON h.id = u.household_id AND h.group_id = u.group_id
+        LEFT JOIN household_preferences p ON p.household_id = h.id
+        WHERE u.id = #{userId} AND u.group_id = #{groupId} AND h.id = #{householdId}
+    </select>
+    <insert id="insertRecipe">
+        INSERT INTO recipes (id, slug, group_id, user_id, name, name_normalized, description,
+            description_normalized, recipe_servings, recipe_yield_quantity, date_added, date_updated,
+            created_at, update_at, is_ocr_recipe)
+        VALUES (#{recipeId}, #{slug}, #{groupId}, #{userId}, #{name}, #{nameNormalized}, '', '', 0, 0,
+            #{dateAdded}, #{timestamp}, #{timestamp}, #{timestamp}, #{no})
+    </insert>
+    <insert id="insertIngredient">
+        INSERT INTO recipes_ingredients (recipe_id, position, quantity, note, note_normalized, reference_id,
+            created_at, update_at)
+        VALUES (#{recipeId}, 0, 0, #{ingredientNote}, #{ingredientNormalized}, #{referenceId}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertInstruction">
+        INSERT INTO recipe_instructions (id, recipe_id, position, type, title, summary, text, created_at, update_at)
+        VALUES (#{instructionId}, #{recipeId}, 0, '', '', '', #{instructionText}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertNutrition">
+        INSERT INTO recipe_nutrition (recipe_id, created_at, update_at)
+        VALUES (#{recipeId}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertSettings">
+        INSERT INTO recipe_settings (recipe_id, public, show_nutrition, show_assets, landscape_view,
+            disable_comments, locked, disable_amount, created_at, update_at)
+        VALUES (#{recipeId}, #{public}, #{showNutrition}, #{showAssets}, #{landscapeView}, #{disableComments},
+            #{no}, #{yes}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertTimeline">
+        INSERT INTO recipe_timeline_events (id, recipe_id, user_id, subject, event_type, image, timestamp,
+            created_at, update_at)
+        VALUES (#{eventId}, #{recipeId}, #{userId}, 'recipe.recipe-created', 'system', 'does not have image',
+            #{timestamp}, #{timelineTimestamp}, #{timelineTimestamp})
+    </insert>
+</mapper>
