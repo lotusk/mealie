@@ -48,12 +48,17 @@
 	}
 	reverse_proxy @authToken {$AUTH_TOKEN_UPSTREAM:host.docker.internal:9100}
 
-	# Exact authenticated profile read; ratings, favorites and writes stay on Python.
+	# Exact authenticated profile and ratings list reads; favorites, individual ratings and writes stay on Python.
 	@userSelf {
 		method GET
 		path /api/users/self
 	}
 	reverse_proxy @userSelf {$JAVA_UPSTREAM}
+	@userRatings {
+		method GET
+		path /api/users/self/ratings
+	}
+	reverse_proxy @userRatings {$JAVA_UPSTREAM}
 
 	# Exact group summary; group members, preferences, settings and writes remain on Python.
 	@groupSelf {

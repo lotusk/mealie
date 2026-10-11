@@ -40,6 +40,13 @@ public class UserSelfRepository {
                 row.householdId(), row.householdSlug(), tokens, row.cacheKey()));
     }
 
+    public List<UserRatingsResponse.Rating> findRatings(UUID userId) {
+        return mapper.findRatings(dialect.uuid(userId)).stream()
+                .map(row -> new UserRatingsResponse.Rating(
+                        row.recipeId(), row.rating(), Boolean.TRUE.equals(row.isFavorite())))
+                .toList();
+    }
+
     private LongLiveToken toToken(UserSelfTokenRow row) {
         return new LongLiveToken(row.name(), row.id(), row.createdAt());
     }

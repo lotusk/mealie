@@ -41,6 +41,21 @@
         </constructor>
     </resultMap>
 
+    <resultMap id="userRatingRow" type="io.mealie.backend.persistence.model.UserRatingRow">
+        <constructor>
+            <idArg column="recipe_id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="rating" javaType="java.lang.Double"/>
+            <arg column="is_favorite" javaType="java.lang.Boolean"/>
+        </constructor>
+    </resultMap>
+
+    <select id="findRatings" resultMap="userRatingRow">
+        SELECT recipe_id, rating, is_favorite
+        FROM users_to_recipes
+        WHERE user_id = #{userId}
+    </select>
+
     <select id="findById" resultMap="userSelfRow">
         SELECT u.id, u.username, u.full_name, u.email, u.auth_method,
                u.admin, u.advanced, u.show_announcements, u.last_read_announcement,

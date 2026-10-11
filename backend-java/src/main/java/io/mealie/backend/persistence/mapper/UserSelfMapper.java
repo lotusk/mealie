@@ -1,5 +1,6 @@
 package io.mealie.backend.persistence.mapper;
 
+import io.mealie.backend.persistence.model.UserRatingRow;
 import io.mealie.backend.persistence.model.UserSelfRow;
 import io.mealie.backend.persistence.model.UserSelfTokenRow;
 import java.util.List;
@@ -10,4 +11,6 @@ public interface UserSelfMapper {
     UserSelfRow findById(@Param("id") Object id);
 
     List<UserSelfTokenRow> findTokens(@Param("userId") Object userId);
+
+    List<UserRatingRow> findRatings(@Param("userId") Object userId);
 }

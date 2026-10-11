@@ -18,4 +18,9 @@ public class UserSelfService {
     public UserSelfResponse get(UUID id) {
         return users.findById(id).orElseThrow(AuthService::credentialsException);
     }
+
+    @Transactional(readOnly = true)
+    public UserRatingsResponse ratings(UUID userId) {
+        return new UserRatingsResponse(users.findRatings(userId));
+    }
 }
