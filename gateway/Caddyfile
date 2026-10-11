@@ -60,12 +60,40 @@
 	}
 	reverse_proxy @userRatings {$JAVA_UPSTREAM}
 
-	# Exact group summary; group members, preferences, settings and writes remain on Python.
+	# Exact group summary; preferences, settings and writes remain on Python.
 	@groupSelf {
 		method GET
 		path /api/groups/self
 	}
 	reverse_proxy @groupSelf {$JAVA_UPSTREAM}
+
+	# Exact member listing only; member detail and other methods remain on Python.
+	@groupMembers {
+		method GET
+		path /api/groups/members
+	}
+	reverse_proxy @groupMembers {$JAVA_UPSTREAM}
+
+	# Food listing only; food detail, empty, merge and writes stay on Python.
+	@foodList {
+		method GET
+		path /api/foods
+	}
+	reverse_proxy @foodList {$JAVA_UPSTREAM}
+
+	# Exact group household listing; detail routing is handled separately below.
+	@groupHouseholds {
+		method GET
+		path /api/groups/households
+	}
+	reverse_proxy @groupHouseholds {$JAVA_UPSTREAM}
+
+	# Canary migration: only this household detail GET moves; other detail URLs keep their current backend.
+	@groupHouseholdDetail {
+		method GET
+		path /api/groups/households/9980e273-156a-4cb7-8488-299be07defc4
+	}
+	reverse_proxy @groupHouseholdDetail {$JAVA_UPSTREAM}
 
 	# Manual creation moves only this exact POST. Imports and other writes remain on Python.
 	@recipeCreate {

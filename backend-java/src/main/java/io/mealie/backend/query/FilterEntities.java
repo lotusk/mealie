@@ -20,8 +20,11 @@ public final class FilterEntities {
             "preferences", "recipe_actions", "server_tasks", "shopping_lists", "webhooks"));
 
     public static final FilterEntity HOUSEHOLD = new FilterEntity("Household", "households", Set.of(
-            "cookbooks", "group_event_notifiers", "ingredient_foods_on_hand", "invite_tokens", "preferences",
+            "cookbooks", "group_event_notifiers", "ingredient_foods_on_hand", "invite_tokens",
             "recipe_actions", "webhooks"));
+
+    public static final FilterEntity HOUSEHOLD_PREFERENCES = new FilterEntity(
+            "HouseholdPreferencesModel", "household_preferences", Set.of());
 
     public static final FilterEntity USER = new FilterEntity("User", "users", Set.of(
             "comments", "favorite_recipes", "mealplans", "owned_recipes", "password_reset_tokens", "rated_recipes",
@@ -38,7 +41,49 @@ public final class FilterEntities {
 
     public static final FilterEntity TOOL = new FilterEntity("Tool", "tools", Set.of());
 
+    public static final FilterEntity FOOD = new FilterEntity("IngredientFoodModel", "ingredient_foods",
+            Set.of("ingredients", "recipe_substitution_references"));
+    public static final FilterEntity FOOD_ALIAS = new FilterEntity("IngredientFoodAliasModel", "ingredient_foods_aliases", Set.of());
+    public static final FilterEntity FOOD_EXTRA = new FilterEntity("IngredientFoodExtras", "ingredient_food_extras", Set.of());
+    public static final FilterEntity FOOD_SUBSTITUTION = new FilterEntity(
+            "IngredientFoodSubstitutionModel", "ingredient_foods_substitutions", Set.of());
+    public static final FilterEntity FOOD_LABEL = new FilterEntity("MultiPurposeLabel", "multi_purpose_labels",
+            Set.of("shopping_list_items", "shopping_lists_label_settings"));
+
     static {
+        FOOD.baseColumns().column("group_id", ColumnType.GUID).column("name", ColumnType.STRING)
+                .column("plural_name", ColumnType.STRING).column("description", ColumnType.STRING)
+                .column("label_id", ColumnType.GUID).column("name_normalized", ColumnType.STRING)
+                .column("plural_name_normalized", ColumnType.STRING).unfilterable("recipe_count", "on_hand")
+                .relation("group", () -> GROUP, "groups", false, "groups.id = ingredient_foods.group_id")
+                .relation("label", () -> FOOD_LABEL, "multi_purpose_labels", false,
+                        "multi_purpose_labels.id = ingredient_foods.label_id")
+                .relation("aliases", () -> FOOD_ALIAS, "ingredient_foods_aliases", true,
+                        "ingredient_foods.id = ingredient_foods_aliases.food_id")
+                .relation("extras", () -> FOOD_EXTRA, "ingredient_food_extras", true,
+                        "ingredient_foods.id = ingredient_food_extras.ingredient_food_id")
+                .relation("substitutions", () -> FOOD_SUBSTITUTION, "ingredient_foods_substitutions", true,
+                        "ingredient_foods.id = ingredient_foods_substitutions.food_id")
+                .relation("substitution_references", () -> FOOD_SUBSTITUTION, "ingredient_foods_substitutions", true,
+                        "ingredient_foods.id = ingredient_foods_substitutions.substitute_food_id")
+                .secondary("households_with_ingredient_food", () -> HOUSEHOLD, "households", "households_to_ingredient_foods",
+                        "ingredient_foods.id = households_to_ingredient_foods.food_id",
+                        "households.id = households_to_ingredient_foods.household_id");
+        FOOD_ALIAS.baseColumns().column("food_id", ColumnType.GUID).column("name", ColumnType.STRING)
+                .column("name_normalized", ColumnType.STRING)
+                .relation("food", () -> FOOD, "ingredient_foods", false, "ingredient_foods.id = ingredient_foods_aliases.food_id");
+        FOOD_EXTRA.baseColumns().column("id", ColumnType.INTEGER).column("ingredient_food_id", ColumnType.GUID)
+                .column("key_name", ColumnType.STRING).column("value", ColumnType.STRING);
+        FOOD_SUBSTITUTION.baseColumns().column("food_id", ColumnType.GUID).column("substitute_food_id", ColumnType.GUID)
+                .column("note", ColumnType.STRING).column("position", ColumnType.INTEGER)
+                .relation("food", () -> FOOD, "ingredient_foods", false, "ingredient_foods.id = ingredient_foods_substitutions.food_id")
+                .relation("substitute_food", () -> FOOD, "ingredient_foods", false,
+                        "ingredient_foods.id = ingredient_foods_substitutions.substitute_food_id");
+        FOOD_LABEL.baseColumns().column("group_id", ColumnType.GUID).column("name", ColumnType.STRING)
+                .column("color", ColumnType.STRING)
+                .relation("group", () -> GROUP, "groups", false, "groups.id = multi_purpose_labels.group_id")
+                .relation("foods", () -> FOOD, "ingredient_foods", true, "multi_purpose_labels.id = ingredient_foods.label_id");
+
         GROUP.column("name", ColumnType.STRING).column("slug", ColumnType.STRING).baseColumns()
                 .relation("households", () -> HOUSEHOLD, "households", true, "groups.id = households.group_id")
                 .relation("users", () -> USER, "users", true, "groups.id = users.group_id")
@@ -49,12 +94,25 @@ public final class FilterEntities {
         HOUSEHOLD.column("name", ColumnType.STRING).column("slug", ColumnType.STRING)
                 .column("group_id", ColumnType.GUID).baseColumns()
                 .relation("group", () -> GROUP, "groups", false, "groups.id = households.group_id")
+                .relation("preferences", () -> HOUSEHOLD_PREFERENCES, "household_preferences", false,
+                        "households.id = household_preferences.household_id")
                 .relation("users", () -> USER, "users", true, "households.id = users.household_id")
                 .secondary("made_recipes", () -> RECIPE, "recipes", "households_to_recipes",
                         "households.id = households_to_recipes.household_id",
                         "recipes.id = households_to_recipes.recipe_id")
                 .secondary("tools_on_hand", () -> TOOL, "tools", "households_to_tools",
                         "households.id = households_to_tools.household_id", "tools.id = households_to_tools.tool_id");
+
+        HOUSEHOLD_PREFERENCES.baseColumns().column("household_id", ColumnType.GUID)
+                .column("private_household", ColumnType.BOOLEAN).column("show_announcements", ColumnType.BOOLEAN)
+                .column("lock_recipe_edits_from_other_households", ColumnType.BOOLEAN)
+                .column("first_day_of_week", ColumnType.INTEGER).column("recipe_public", ColumnType.BOOLEAN)
+                .column("recipe_show_nutrition", ColumnType.BOOLEAN).column("recipe_show_assets", ColumnType.BOOLEAN)
+                .column("recipe_landscape_view", ColumnType.BOOLEAN).column("recipe_disable_comments", ColumnType.BOOLEAN)
+                .column("recipe_disable_amount", ColumnType.BOOLEAN)
+                .relation("household", () -> HOUSEHOLD, "households", false,
+                        "households.id = household_preferences.household_id")
+                .proxy("group_id", "household", "group_id");
 
         USER.column("full_name", ColumnType.STRING).column("username", ColumnType.STRING)
                 .column("group_id", ColumnType.GUID).column("household_id", ColumnType.GUID).baseColumns()

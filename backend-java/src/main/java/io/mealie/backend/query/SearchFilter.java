@@ -1,5 +1,6 @@
 package io.mealie.backend.query;
 
+import io.mealie.backend.compat.PySlugify;
 import io.mealie.backend.compat.PyStr;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,12 @@ public final class SearchFilter {
 
     /** normalizeCharacters is the schema's {@code _normalize_search}. */
     public SearchFilter(String search, boolean postgres, boolean normalizeCharacters) {
-        if (normalizeCharacters) {
-            throw new UnsupportedOperationException("character normalization is not ported yet");
-        }
         this.fuzzy = postgres && !QUOTED.matcher(PyStr.strip(search)).find();
-        this.search = PyStr.strip(translatePunctuation(search));
+        String normalized = translatePunctuation(search);
+        if (normalizeCharacters) {
+            normalized = PySlugify.transliterate(normalized).toLowerCase(java.util.Locale.ROOT);
+        }
+        this.search = PyStr.strip(normalized);
         this.searchList = buildSearchList(this.search);
     }
 

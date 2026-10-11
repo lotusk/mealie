@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.GroupHouseholdMapper">
+
+    <resultMap id="householdRow" type="io.mealie.backend.persistence.model.GroupHouseholdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="group_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="slug" javaType="java.lang.String"/>
+            <arg column="preferences_id" javaType="java.util.UUID"
+                 typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="private_household" javaType="java.lang.Boolean"/>
+            <arg column="show_announcements" javaType="java.lang.Boolean"/>
+            <arg column="lock_recipe_edits_from_other_households" javaType="java.lang.Boolean"/>
+            <arg column="first_day_of_week" javaType="java.lang.Integer"/>
+            <arg column="recipe_public" javaType="java.lang.Boolean"/>
+            <arg column="recipe_show_nutrition" javaType="java.lang.Boolean"/>
+            <arg column="recipe_show_assets" javaType="java.lang.Boolean"/>
+            <arg column="recipe_landscape_view" javaType="java.lang.Boolean"/>
+            <arg column="recipe_disable_comments" javaType="java.lang.Boolean"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="idRow" type="io.mealie.backend.persistence.model.IdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <!-- Only validated SqlFragments are interpolated; request values remain bound parameters. -->
+    <select id="count" resultType="long">
+        SELECT count(*) FROM households WHERE ${where.sql}
+    </select>
+
+    <select id="ids" resultMap="idRow">
+        SELECT households.id FROM households WHERE ${where.sql}
+    </select>
+
+    <sql id="householdSummary">
+        SELECT households.id, households.group_id, households.name, households.slug,
+               p.id AS preferences_id, p.private_household, p.show_announcements,
+               p.lock_recipe_edits_from_other_households, p.first_day_of_week, p.recipe_public,
+               p.recipe_show_nutrition, p.recipe_show_assets, p.recipe_landscape_view, p.recipe_disable_comments
+        FROM households
+        LEFT JOIN household_preferences p ON p.household_id = households.id
+    </sql>
+
+    <select id="findOne" resultMap="householdRow">
+        <include refid="householdSummary"/>
+        WHERE households.group_id = #{groupId}
+        <choose>
+            <when test="id != null">AND households.id = #{id}</when>
+            <otherwise>AND households.slug = #{slug}</otherwise>
+        </choose>
+    </select>
+
+    <select id="page" resultMap="householdRow">
+        <include refid="householdSummary"/>
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+        <choose>
+            <when test="limit != null">LIMIT #{limit}</when>
+            <when test="sqlite">LIMIT -1</when>
+        </choose>
+        OFFSET #{offset}
+    </select>
+</mapper>
