@@ -9,6 +9,11 @@
   },
   "cases": [
     {
+      "name": "current user's ratings",
+      "method": "GET",
+      "path": "/api/users/self/ratings"
+    },
+    {
       "name": "tools: all, by name",
       "method": "GET",
       "path": "/api/organizers/tools?page=1&perPage=-1&orderBy=name&orderDirection=asc"

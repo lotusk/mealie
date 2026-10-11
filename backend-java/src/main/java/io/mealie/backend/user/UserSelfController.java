@@ -17,4 +17,9 @@ public class UserSelfController {
     UserSelfResponse get(AuthUser user) {
         return service.get(user.id());
     }
+
+    @GetMapping("/api/users/self/ratings")
+    UserRatingsResponse ratings(AuthUser user) {
+        return service.ratings(user.id());
+    }
 }

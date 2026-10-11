@@ -5,7 +5,12 @@ gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It l
 (`JAVA_API_PORT`). The gateway sends everything under `/api/organizers/tags`, the public app-about endpoints, authenticated `GET /api/recipes` listing, and
 `GET /api/recipes/{slug}` detail to Java. Detail accepts a recipe slug or UUID. Other application endpoints remain
 on Python. `POST /api/auth/token` now uses Java for local Mealie password login. Authenticated
-`GET /api/users/self` also uses Java; its sibling ratings/favorites routes and user writes remain on Python.
+`GET /api/users/self` and `GET /api/users/self/ratings` also use Java. The ratings list retains the
+`ratings` wrapper and `recipeId`, nullable `rating`, and `isFavorite` fields, scoped to the authenticated user.
+Individual ratings, favorites routes and user writes remain on Python.
+After `task java:package`, compare the ratings list against Python using an isolated SQLite database:
+`uv run --frozen python dev/rebuild/user_ratings_parity.py --report /tmp/ratings-parity.json`.
+Add `--gateway /path/to/caddy` to also verify Java routing and Python fallbacks.
 Authenticated `GET /api/groups/self` uses Java too; group preferences and AI-provider summaries are read from the
 shared database without returning provider API keys. Other group routes remain on Python.
 `GET /api/organizers/tools` is also served by Java, including pagination, search, query filters, recipe counts and
