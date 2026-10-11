@@ -14,7 +14,21 @@ After `task java:package`, compare the ratings list against Python using an isol
 `uv run --frozen python dev/rebuild/user_ratings_parity.py --report /tmp/ratings-parity.json`.
 Add `--gateway /path/to/caddy` to also verify Java routing and Python fallbacks.
 Authenticated `GET /api/groups/self` uses Java too; group preferences and AI-provider summaries are read from the
-shared database without returning provider API keys. Other group routes remain on Python.
+shared database without returning provider API keys.
+`GET /api/groups/households` also uses Java, with group-scoped pagination, sorting, query filters and household
+preferences. `GET /api/groups/members` also uses Java, returning only UserSummary fields for the authenticated
+group with pagination, sorting and query filters. Member detail (`/api/groups/members/{username_or_id}`),
+other household detail URLs and other group routes remain on Python.
+Household detail is implemented in Java using UUID-or-slug lookup within the authenticated group.
+The gateway currently routes only `GET /api/groups/households/9980e273-156a-4cb7-8488-299be07defc4`
+to this detail handler; other detail paths and all non-GET methods retain their existing routing.
+Member filtering reuses the existing Java User filter metadata: scalar fields and described relationships
+(such as group and household) are supported. Traversal through undescribed relationships, such as
+`tokens` or `comments`, still returns 400 and is not yet at full parity with Python's relationship filtering.
+`GET /api/foods` uses Java with group isolation, pagination, normalized search, sorting, aliases, labels,
+extras, ordered substitutions, household slugs and distinct recipe counts. Other food paths and methods stay on Python.
+Food filters support scalar fields and mapped relationships; traversal through `ingredients` and
+`recipe_substitution_references` remains unsupported by the Java query metadata.
 `GET /api/organizers/tools` is also served by Java, including pagination, search, query filters, recipe counts and
 household slugs. Tool writes and tool detail/empty/merge routes remain on Python. After pulling new Java routes,
 restart `task java` to register them; the gateway watches its Caddyfile automatically.

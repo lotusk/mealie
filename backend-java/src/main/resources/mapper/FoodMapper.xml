@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.FoodMapper">
+    <resultMap id="foodRow" type="io.mealie.backend.persistence.model.FoodRow">
+        <constructor>
+            <arg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="plural_name" javaType="java.lang.String"/>
+            <arg column="description" javaType="java.lang.String"/>
+            <arg column="label_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="joined_label_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="label_name" javaType="java.lang.String"/>
+            <arg column="label_color" javaType="java.lang.String"/>
+            <arg column="label_group_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="recipe_count" javaType="_long"/>
+            <arg column="created_at" javaType="java.time.OffsetDateTime" typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+            <arg column="updated_at" javaType="java.time.OffsetDateTime" typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="idRow" type="io.mealie.backend.persistence.model.IdRow">
+        <constructor>
+            <arg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="nameRow" type="io.mealie.backend.persistence.model.FoodRows$NameRow">
+        <constructor>
+            <arg column="food_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="value" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="extraRow" type="io.mealie.backend.persistence.model.FoodRows$ExtraRow">
+        <constructor>
+            <arg column="food_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="key_name" javaType="java.lang.String"/>
+            <arg column="value" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="substitutionRow" type="io.mealie.backend.persistence.model.FoodRows$SubstitutionRow">
+        <constructor>
+            <arg column="food_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="substitute_food_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="note" javaType="java.lang.String"/>
+            <arg column="joined_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="plural_name" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <!-- SqlFragments contain validated identifiers and bound values, never raw user SQL. -->
+    <select id="count" resultType="long">
+        SELECT count(*) FROM ingredient_foods WHERE ${where.sql}
+    </select>
+    <select id="ids" resultMap="idRow">
+        SELECT ingredient_foods.id FROM ingredient_foods WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+    </select>
+    <select id="page" resultMap="foodRow">
+        SELECT ingredient_foods.id, ingredient_foods.name, ingredient_foods.plural_name,
+               ingredient_foods.description, ingredient_foods.label_id,
+               l.id AS joined_label_id, l.name AS label_name, l.color AS label_color, l.group_id AS label_group_id,
+               (SELECT count(DISTINCT i.recipe_id) FROM recipes_ingredients i
+                WHERE i.food_id = ingredient_foods.id) AS recipe_count,
+               ingredient_foods.created_at, ingredient_foods.update_at AS updated_at
+        FROM ingredient_foods
+        LEFT JOIN multi_purpose_labels l ON l.id = ingredient_foods.label_id
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+        <choose>
+            <when test="limit != null">LIMIT #{limit}</when>
+            <when test="sqlite">LIMIT -1</when>
+        </choose>
+        OFFSET #{offset}
+    </select>
+    <sql id="selectedIds">
+        <foreach collection="ids" item="id" open="(" separator=", " close=")">
+            #{id, javaType=java.lang.Object}
+        </foreach>
+    </sql>
+    <select id="aliases" resultMap="nameRow">
+        SELECT food_id, name AS value FROM ingredient_foods_aliases WHERE food_id IN <include refid="selectedIds"/>
+    </select>
+    <select id="households" resultMap="nameRow">
+        SELECT link.food_id, h.slug AS value FROM households h
+        JOIN households_to_ingredient_foods link ON link.household_id = h.id
+        WHERE link.food_id IN <include refid="selectedIds"/>
+    </select>
+    <select id="extras" resultMap="extraRow">
+        SELECT ingredient_food_id AS food_id, key_name, value FROM ingredient_food_extras
+        WHERE ingredient_food_id IN <include refid="selectedIds"/>
+    </select>
+    <select id="substitutions" resultMap="substitutionRow">
+        SELECT s.food_id, s.substitute_food_id, s.note, f.id AS joined_id, f.name, f.plural_name
+        FROM ingredient_foods_substitutions s
+        LEFT JOIN ingredient_foods f ON f.id = s.substitute_food_id
+        WHERE s.food_id IN <include refid="selectedIds"/>
+        ORDER BY s.position
+    </select>
+</mapper>

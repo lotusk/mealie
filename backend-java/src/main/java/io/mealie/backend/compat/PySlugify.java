@@ -51,7 +51,7 @@ public final class PySlugify {
     }
 
     /** text_unidecode.unidecode(); ASCII input is returned unchanged, as python-slugify short-circuits it. */
-    static String transliterate(String text) {
+    public static String transliterate(String text) {
         if (text.chars().allMatch(c -> c < 0x80)) {
             return text;
         }
