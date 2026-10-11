@@ -3,7 +3,8 @@
 The Python backend is being replaced by a Java backend (`backend-java/`) one route at a time. A load balancer on
 **:8080** sits in front of both and decides, per path, which backend answers. Public `GET /api/app/about`, authenticated
 `GET /api/recipes` listing and `GET /api/recipes/{slug}` detail (slug or UUID), and exact manual `POST /api/recipes`
-go to Java, as do the tag and category organizers (`/api/organizers/tags`, `/api/organizers/categories`). Local password login and user/group self reads also use Java as configured in the routing table. Other recipe writes and imports remain on Python.
+go to Java, along with exact `PATCH /api/recipes/{slug}/last-made` and `POST /api/recipes/{slug}/duplicate`,
+as do the tag and category organizers (`/api/organizers/tags`, `/api/organizers/categories`). Local password login and user/group self reads also use Java as configured in the routing table. Other recipe writes and imports remain on Python.
 
 ```
 browser ─► frontend :3000 ─► gateway :8080 ─┬─► Python (FastAPI) :9000 ─┐
@@ -216,3 +217,15 @@ In browser Network, verify that PATCH returns 200 with the full recipe and `X-Me
 timeline POST has `X-Mealie-Backend: python`. Refresh the recipe, then use Recipe Finder's **Last Made** filter to
 check the caller household's date. An older date does not reduce the recipe's overall maximum, and the frontend
 only issues the PATCH when the selected date advances the displayed date.
+
+
+## Recipe duplication routing
+
+The `recipeDuplicate` matcher combines POST with `^/api/recipes/[^/]+/duplicate$`. Other methods, trailing-slash
+redirects, edit/delete/import endpoints and timeline APIs continue to use Python. Existing recipe detail, listing,
+creation and last-made matchers remain disjoint. Check the duplicate POST's `X-Mealie-Backend: java` header and
+`JAVA_RECIPE_DUPLICATED` log; a detail GET alone does not prove duplication ran in Java.
+
+Use the [isolated duplication parity harness](recipe-duplicate.md) for writes. The ordinary read-only diff harness
+must not be used to duplicate recipes in a shared development database. `/internal/*` and `/api/internal/*` stay
+blocked at the gateway; the approved notification adapter accepts signed service calls directly.

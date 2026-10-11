@@ -3,6 +3,7 @@ package io.mealie.backend.web;
 import io.mealie.backend.auth.AuthUserArgumentResolver;
 import io.mealie.backend.recipe.RecipeCreateBodyResolver;
 import io.mealie.backend.recipe.RecipeLastMadeBodyResolver;
+import io.mealie.backend.recipe.RecipeDuplicateBodyResolver;
 import io.mealie.backend.web.validation.PyRequestBodyArgumentResolver;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
@@ -19,23 +20,27 @@ public class WebConfig implements WebMvcConfigurer {
     private final RecipeCreateBodyResolver recipeCreateBodyResolver;
 
     private final RecipeLastMadeBodyResolver recipeLastMadeBodyResolver;
+    private final RecipeDuplicateBodyResolver recipeDuplicateBodyResolver;
 
     public WebConfig(AuthUserArgumentResolver authUserArgumentResolver,
             PyRequestBodyArgumentResolver pyRequestBodyArgumentResolver,
             JavaBackendAccessInterceptor accessInterceptor,
             RecipeCreateBodyResolver recipeCreateBodyResolver,
-            RecipeLastMadeBodyResolver recipeLastMadeBodyResolver) {
+            RecipeLastMadeBodyResolver recipeLastMadeBodyResolver,
+            RecipeDuplicateBodyResolver recipeDuplicateBodyResolver) {
         this.authUserArgumentResolver = authUserArgumentResolver;
         this.pyRequestBodyArgumentResolver = pyRequestBodyArgumentResolver;
         this.accessInterceptor = accessInterceptor;
         this.recipeCreateBodyResolver = recipeCreateBodyResolver;
         this.recipeLastMadeBodyResolver = recipeLastMadeBodyResolver;
+        this.recipeDuplicateBodyResolver = recipeDuplicateBodyResolver;
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(recipeCreateBodyResolver);
         resolvers.add(recipeLastMadeBodyResolver);
+        resolvers.add(recipeDuplicateBodyResolver);
         resolvers.add(authUserArgumentResolver);
         resolvers.add(pyRequestBodyArgumentResolver);
     }

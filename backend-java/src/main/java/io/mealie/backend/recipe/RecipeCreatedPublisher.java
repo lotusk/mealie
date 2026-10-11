@@ -54,14 +54,18 @@ public class RecipeCreatedPublisher {
     }
 
     void publish(UUID recipeId, AuthUser user, String locale, String integrationId) {
-        publish(recipeId, user.householdId(), user, locale, integrationId, endpoint, "RECIPE_CREATED");
+        publish(recipeId, user.householdId(), user, locale, integrationId, endpoint, "RECIPE_CREATED", null);
+    }
+
+    void publishDuplicated(UUID recipeId, AuthUser user, String locale, String integrationId) {
+        publish(recipeId, user.householdId(), user, locale, integrationId, endpoint, "RECIPE_DUPLICATED", "duplicate");
     }
 
     void publishUpdated(UUID recipeId, UUID householdId, AuthUser user, String locale, String integrationId) {
-        publish(recipeId, householdId, user, locale, integrationId, updateEndpoint, "RECIPE_UPDATED");
+        publish(recipeId, householdId, user, locale, integrationId, updateEndpoint, "RECIPE_UPDATED", null);
     }
 
-    private void publish(UUID recipeId, UUID householdId, AuthUser user, String locale, String integrationId, URI target, String marker) {
+    private void publish(UUID recipeId, UUID householdId, AuthUser user, String locale, String integrationId, URI target, String marker, String messageKind) {
         UUID eventId = UUID.randomUUID();
         var payload = new LinkedHashMap<String, Object>();
         payload.put("eventId", eventId.toString());
@@ -72,6 +76,7 @@ public class RecipeCreatedPublisher {
         payload.put("householdId", householdId.toString());
         payload.put("locale", locale);
         payload.put("integrationId", integrationId);
+        if (messageKind != null) payload.put("messageKind", messageKind);
         byte[] body = json.writeValueAsBytes(payload);
         // Match FastAPI BackgroundTasks: notification delivery is best effort after the write and cannot roll it back.
         executor.submit(() -> {
