@@ -86,6 +86,9 @@ async def _deliver(request: Request, background: BackgroundTasks, *, updated: bo
         if event_timestamp.tzinfo is None:
             raise ValueError("timestamp must have timezone")
         locale, integration_id = data["locale"], data["integrationId"]
+        message_kind = data.get("messageKind", "create")
+        if message_kind not in ("create", "duplicate") or (updated and message_kind != "create"):
+            raise ValueError("invalid recipe event message kind")
         if not isinstance(locale, str) or not isinstance(integration_id, str):
             raise ValueError("expected strings")
     except (ValueError, KeyError, TypeError) as exc:
@@ -123,11 +126,14 @@ async def _deliver(request: Request, background: BackgroundTasks, *, updated: bo
     event_type = EventTypes.recipe_updated if updated else EventTypes.recipe_created
     operation = EventOperation.update if updated else EventOperation.create
     translator = get_locale_provider(locale)
-    message = translator.t(
-        "notifications.generic-updated-with-url" if updated else "notifications.generic-created-with-url",
-        name=row[0],
-        url=urls.recipe_url(row[2], row[1], get_app_settings().BASE_URL),
-    )
+    if message_kind == "duplicate":
+        message = translator.t("notifications.generic-duplicated", name=row[0])
+    else:
+        message = translator.t(
+            "notifications.generic-updated-with-url" if updated else "notifications.generic-created-with-url",
+            name=row[0],
+            url=urls.recipe_url(row[2], row[1], get_app_settings().BASE_URL),
+        )
     event = Event(
         message=EventBusMessage.from_type(event_type, body=message, translator=translator),
         event_type=event_type,

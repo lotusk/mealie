@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.RecipeDuplicateMapper">
+    <insert id="insertRecipe">
+        INSERT INTO recipes (id, slug, group_id, user_id, name, name_normalized, description, description_normalized, image, recipe_servings, recipe_yield_quantity, recipe_yield, total_time, prep_time, cook_time, perform_time, total_time_seconds, prep_time_seconds, perform_time_seconds, rating, org_url, date_added, date_updated, created_at, update_at, last_made, is_ocr_recipe)
+        VALUES (#{recipeId}, #{slug}, #{groupId}, #{userId}, #{name}, #{nameNormalized}, #{description}, #{descriptionNormalized}, #{image}, #{recipeServings}, #{recipeYieldQuantity}, #{recipeYield}, #{totalTime}, #{prepTime}, #{cookTime}, #{performTime}, #{totalTimeSeconds}, #{prepTimeSeconds}, #{performTimeSeconds}, #{rating}, #{orgURL}, #{dateAdded}, #{timestamp}, #{createdAt}, #{timestamp}, NULL, #{no})
+    </insert>
+    <insert id="copyOrganizers">INSERT INTO recipes_to_tags (recipe_id, tag_id) SELECT #{recipeId}, tag_id FROM recipes_to_tags WHERE recipe_id=#{sourceId}</insert>
+    <insert id="copyCategories">INSERT INTO recipes_to_categories (recipe_id, category_id) SELECT #{recipeId}, category_id FROM recipes_to_categories WHERE recipe_id=#{sourceId}</insert>
+    <insert id="copyTools">INSERT INTO recipes_to_tools (recipe_id, tool_id) SELECT #{recipeId}, tool_id FROM recipes_to_tools WHERE recipe_id=#{sourceId}</insert>
+    <insert id="insertNutrition">
+        INSERT INTO recipe_nutrition (recipe_id, calories, carbohydrate_content, cholesterol_content, fat_content, fiber_content, protein_content, saturated_fat_content, sodium_content, sugar_content, trans_fat_content, unsaturated_fat_content, created_at, update_at)
+        VALUES (#{recipeId}, #{calories}, #{carbohydrateContent}, #{cholesterolContent}, #{fatContent}, #{fiberContent}, #{proteinContent}, #{saturatedFatContent}, #{sodiumContent}, #{sugarContent}, #{transFatContent}, #{unsaturatedFatContent}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertSettings">
+        INSERT INTO recipe_settings (recipe_id, public, show_nutrition, show_assets, landscape_view, disable_comments, locked, disable_amount, created_at, update_at)
+        VALUES (#{recipeId}, #{public}, #{showNutrition}, #{showAssets}, #{landscapeView}, #{disableComments}, #{locked}, #{yes}, #{timestamp}, #{timestamp})
+    </insert>
+    <select id="insertIngredient" resultType="long" affectData="true" flushCache="true">
+        INSERT INTO recipes_ingredients (recipe_id, position, quantity, title, note, original_text, unit_id, food_id, referenced_recipe_id, reference_id, note_normalized, original_text_normalized, created_at, update_at)
+        VALUES (#{recipeId}, #{position}, #{quantity}, #{title}, #{note}, #{originalText}, #{unitId}, #{foodId}, #{referencedRecipeId}, #{referenceId}, #{noteNormalized}, #{originalTextNormalized}, #{timestamp}, #{timestamp}) RETURNING id
+    </select>
+    <insert id="insertInstruction">
+        INSERT INTO recipe_instructions (id, recipe_id, position, type, title, summary, text, created_at, update_at)
+        VALUES (#{id}, #{recipeId}, #{position}, '', #{title}, #{summary}, #{text}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertIngredientReference">
+        INSERT INTO recipe_ingredient_ref_link (instruction_id, reference_id, created_at, update_at)
+        VALUES (#{instructionId}, #{referenceId}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertNoteReference">
+        INSERT INTO recipe_note_ref_link (instruction_id, reference_id, created_at, update_at)
+        VALUES (#{instructionId}, #{referenceId}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertSubstitution">
+        INSERT INTO recipes_ingredients_substitutions (id, ingredient_id, substitute_food_id, note, position, created_at, update_at)
+        SELECT #{id}, #{ingredientId}, #{substituteFoodId}, #{note}, #{position}, #{timestamp}, #{timestamp}
+        <if test="substituteFoodId != null">WHERE EXISTS (SELECT 1 FROM ingredient_foods WHERE id=#{substituteFoodId} AND group_id=#{groupId})</if>
+    </insert>
+    <insert id="insertNote">
+        INSERT INTO notes (recipe_id, title, text, reference_id, created_at, update_at)
+        VALUES (#{recipeId}, #{title}, #{text}, #{referenceId}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertAsset">
+        INSERT INTO recipe_assets (recipe_id, name, icon, file_name, created_at, update_at)
+        VALUES (#{recipeId}, #{name}, #{icon}, #{fileName}, #{timestamp}, #{timestamp})
+    </insert>
+    <insert id="insertExtra">
+        INSERT INTO api_extras (recipee_id, key_name, value, created_at, update_at)
+        VALUES (#{recipeId}, #{key}, #{value}, #{timestamp}, #{timestamp})
+    </insert>
+</mapper>

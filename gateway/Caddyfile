@@ -69,6 +69,13 @@
 	}
 	reverse_proxy @recipeCreate {$JAVA_UPSTREAM}
 
+	# Exact duplication POST only; imports, other writes and duplicate-path GET stay on Python.
+	@recipeDuplicate {
+		method POST
+		path_regexp recipeDuplicate ^/api/recipes/[^/]+/duplicate$
+	}
+	reverse_proxy @recipeDuplicate {$JAVA_UPSTREAM}
+
 	# Only the last-made PATCH moves; other recipe writes and timeline APIs stay on Python.
 	@recipeLastMade {
 		method PATCH

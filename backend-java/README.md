@@ -4,7 +4,7 @@ Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python bac
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
 (`JAVA_API_PORT`). The gateway sends everything under `/api/organizers/tags` and `/api/organizers/categories`, the public app-about endpoints,
 authenticated `GET /api/recipes` listing, `GET /api/recipes/{slug}` detail, exact manual `POST /api/recipes`
-creation, and `PATCH /api/recipes/{slug}/last-made` to Java. Detail accepts a recipe slug or UUID. Other application
+creation, `PATCH /api/recipes/{slug}/last-made`, and exact `POST /api/recipes/{slug}/duplicate` to Java. Detail accepts a recipe slug or UUID. Other application
 endpoints remain
 on Python. `POST /api/auth/token` now uses Java for local Mealie password login. Authenticated
 `GET /api/users/self` also uses Java; its sibling ratings/favorites routes and user writes remain on Python.
@@ -213,7 +213,7 @@ text, household settings, empty nutrition and the first system timeline entry. M
 Python/Alembic schema with parameters converted through `SqlDialect`. Creation and timeline commits retain the
 original Python failure boundary. A successful response is HTTP 201 with a JSON string containing the slug.
 
-Python still owns recipe imports, duplicate/edit/delete routes, timeline APIs and notification configuration.
+Python still owns recipe imports, edit/delete routes, timeline APIs and notification configuration.
 The approved event-only adapter preserves the existing Apprise delivery destinations and subscriber rules.
 Java sends signed metadata about an already committed recipe to `/internal/recipe-created`; the adapter verifies
 ownership, reads the recipe and dispatches `recipe_created` using the original EventBus/Apprise implementation.
@@ -300,3 +300,34 @@ uses the normal development database, or runs destructive cleanup. Reports conta
 state, notifications, failures, artifact hashes and service commands. Native updates and notifications must still
 work directly and through the gateway after only Python's matching PATCH is disabled. Creation, detail, listing,
 pagination, last-made filters and unmigrated route boundaries are checked in the same fixture stack.
+
+
+## Recipe duplication
+
+Exact `POST /api/recipes/{slug}/duplicate` is implemented in Java. It accepts a slug or UUID and an optional
+nullable name inside the required JSON object. Authentication, group access, naming retries and the HTTP 201
+full recipe response match Python. Same-group users may duplicate private/locked recipes across households;
+the new recipe belongs to the caller. See [the duplication behavior and test guide](../docs/rebuild/recipe-duplicate.md).
+
+`RecipeDuplicateRepository` writes independent recipe, ingredient, substitution, instruction/reference, nutrition,
+settings, note, asset and extra rows through MyBatis and the shared SQL dialect. Organizer, food/unit and referenced
+recipe identities remain shared as in Python. `RecipeDuplicateFiles` copies the entire recipe directory in Java.
+Java logs `JAVA_RECIPE_DUPLICATED`; the existing signed event-only adapter receives the approved `messageKind`
+variant `duplicate` and delivers the original `recipe_created` event with the localized `generic-duplicated` message.
+Creation and last-made notification variants retain their existing behavior. No duplication request is sent to Python.
+
+Build into a separate directory when retained previews are running, then test both engines:
+
+```bash
+uv run --frozen python dev/rebuild/recipe_duplicate_parity.py --engine sqlite \
+  --jar /path/to/tested.jar --gateway /path/to/caddy --report /tmp/duplicate-sqlite.json
+uv run --frozen python dev/rebuild/recipe_duplicate_parity.py --engine postgres --port-offset 200 \
+  --jar /path/to/tested.jar --gateway /path/to/caddy --report /tmp/duplicate-postgres.json
+```
+
+The harness checks direct Java and the actual gateway against Python. Add `--production-validation` for production
+error envelopes. It creates new retained SQLite directories or `compx574_recipe_duplicate_005_*` PostgreSQL databases
+on the existing isolated server at localhost:55432 (test credentials mealie/mealie), verifies they are empty, and
+never uses or deletes development data. Ports default to 11400/11410/11480/11490. Reports include raw responses,
+stored rows, file hashes, real Apprise HTTP delivery, commands, artifact SHA-256, failures and native operation
+with precisely Python's duplication POST disabled. The harness stops only the temporary servers it started.
