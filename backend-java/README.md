@@ -2,14 +2,19 @@
 
 Spring Boot 4 / Java 21 backend that takes over Mealie's API from the Python backend route by route, behind the
 gateway described in [docs/rebuild/gateway.md](../docs/rebuild/gateway.md). It listens on **:9100**
-(`JAVA_API_PORT`). The gateway sends everything under `/api/organizers/tags` and `/api/organizers/categories`, the public app-about endpoints,
+(`JAVA_API_PORT`). The gateway sends exact `POST /api/organizers/tags` and `POST /api/organizers/categories`, the public app-about endpoints,
 authenticated `GET /api/recipes` listing, `GET /api/recipes/{slug}` detail, exact manual `POST /api/recipes`
 creation, `PATCH /api/recipes/{slug}/last-made`, and exact `POST /api/recipes/{slug}/duplicate` to Java. Detail accepts a recipe slug or UUID. Other application
 endpoints remain
 on Python. `POST /api/auth/token` now uses Java for local Mealie password login. Authenticated
 `GET /api/users/self` and `GET /api/users/self/ratings` also use Java. The ratings list retains the
 `ratings` wrapper and `recipeId`, nullable `rating`, and `isFavorite` fields, scoped to the authenticated user.
-Individual ratings, favorites routes and user writes remain on Python.
+Individual rating reads and favorites routes remain on Python.
+The gateway migrates only
+`POST /api/users/7c242f6f-fd24-4721-aea7-23018b37da88/ratings/korean-style-rice-bowl-1`
+for rating writes. Java enforces self-only writes (including admins), scopes the recipe to the current group,
+preserves omitted/null rating and favorite values on updates, and recalculates the positive-score average
+in the same transaction. Success returns HTTP 200 with JSON `null`; other user writes retain existing routing.
 After `task java:package`, compare the ratings list against Python using an isolated SQLite database:
 `uv run --frozen python dev/rebuild/user_ratings_parity.py --report /tmp/ratings-parity.json`.
 Add `--gateway /path/to/caddy` to also verify Java routing and Python fallbacks.
@@ -30,13 +35,25 @@ extras, ordered substitutions, household slugs and distinct recipe counts. Other
 Food filters support scalar fields and mapped relationships; traversal through `ingredients` and
 `recipe_substitution_references` remains unsupported by the Java query metadata.
 `GET /api/organizers/tools` is also served by Java, including pagination, search, query filters, recipe counts and
-household slugs. Tool writes and tool detail/empty/merge routes remain on Python. After pulling new Java routes,
+household slugs. Exact `POST /api/organizers/tools` also uses Java and returns HTTP 201 with the tool summary.
+Creation requires authentication, without an additional `canOrganize` check, and preserves the supplied name.
+Household slugs are matched within the current group; unknown slugs are ignored and duplicates are collapsed.
+The tool and household links are created in one transaction using MyBatis XML. Other tool writes and tool
+detail/empty/merge routes remain on Python. Constraint errors retain Python's 409 status and error fields,
+but the `exception` diagnostic contains the driver error without SQLAlchemy's SQL/parameter appendix.
+After pulling new Java routes,
 restart `task java` to register them; the gateway watches its Caddyfile automatically.
 
 After `task java:package`, compare tools listing against Python with a fresh temporary SQLite database:
 `uv run --frozen python dev/rebuild/tool_list_parity.py --report /tmp/tools-parity.json`.
-Add `--gateway /path/to/caddy` to also verify the gateway's GET-only routing. The script stops its temporary
+The script's optional `--gateway` assertions predate POST creation and still assume GET-only routing.
+The script stops its temporary
 servers on completion and never uses the development database.
+
+`GET /api/households/shopping/lists` is served by Java with household and group scoping, pagination, filtering,
+sort order, extras, recipe references and multi-purpose label settings. Other shopping-list paths and methods remain
+on Python. Query-filter traversal through collection relationships such as `label_settings`, `list_items` and
+`recipe_references` is not yet mapped in Java.
 
 The password login shares Python's user table, failed-attempt lockout, HS256 secret, token lifetime, and session
 cookie format. LDAP authentication still runs in Python: for LDAP deployments, start the gateway with

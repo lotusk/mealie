@@ -18,6 +18,9 @@ import io.mealie.backend.query.QueryFilterSql;
 import io.mealie.backend.query.SearchFilter;
 import io.mealie.backend.query.SqlFragment;
 import io.mealie.backend.recipe.RecipeToolSummary;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +49,20 @@ public class ToolRepository {
         this.recipeSummaryMapper = recipeSummaryMapper;
         this.dialect = dialect;
         this.queryFilterSql = new QueryFilterSql(dialect);
+    }
+
+    /** Called inside the service transaction: creating the tool and its household links is atomic. */
+    public RecipeToolSummary insert(UUID groupId, String name, String slug, List<String> households) {
+        UUID id = UUID.randomUUID();
+        Object timestamp = dialect.timestamp(OffsetDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.MICROS));
+        mapper.insert(dialect.uuid(id), dialect.uuid(groupId), name, slug, dialect.bool(false), timestamp);
+        if (!households.isEmpty()) {
+            // INSERT SELECT matches Python's group-scoped IN lookup: unknown slugs are ignored and duplicates collapse.
+            mapper.insertHouseholds(dialect.uuid(id), dialect.uuid(groupId), households);
+        }
+        List<String> savedHouseholds = mapper.householdSlugs(List.of(dialect.uuid(id))).stream()
+                .map(ToolHouseholdRow::slug).toList();
+        return new RecipeToolSummary(id, groupId, name, slug, 0, savedHouseholds);
     }
 
     /**

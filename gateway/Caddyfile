@@ -48,7 +48,7 @@
 	}
 	reverse_proxy @authToken {$AUTH_TOKEN_UPSTREAM:host.docker.internal:9100}
 
-	# Exact authenticated profile and ratings list reads; favorites, individual ratings and writes stay on Python.
+	# Exact authenticated profile and ratings list reads; the selected rating write is routed separately below.
 	@userSelf {
 		method GET
 		path /api/users/self
@@ -59,6 +59,13 @@
 		path /api/users/self/ratings
 	}
 	reverse_proxy @userRatings {$JAVA_UPSTREAM}
+
+	# Canary rating write: all other user rating paths and HTTP methods retain their existing routing.
+	@userRatingWrite {
+		method POST
+		path /api/users/7c242f6f-fd24-4721-aea7-23018b37da88/ratings/korean-style-rice-bowl-1
+	}
+	reverse_proxy @userRatingWrite {$JAVA_UPSTREAM}
 
 	# Exact group summary; preferences, settings and writes remain on Python.
 	@groupSelf {
@@ -131,12 +138,37 @@
 	}
 	reverse_proxy @recipeList {$JAVA_UPSTREAM}
 	reverse_proxy @recipeGet {$JAVA_UPSTREAM}
-	reverse_proxy /api/organizers/tags* {$JAVA_UPSTREAM}
-	reverse_proxy /api/organizers/categories* {$JAVA_UPSTREAM}
+	# Only exact tag creation uses Java; other tag paths and methods fall back to Python.
+	@tagCreate {
+		method POST
+		path /api/organizers/tags
+	}
+	reverse_proxy @tagCreate {$JAVA_UPSTREAM}
+	# Only exact category creation moves to Java; all other category requests fall back to Python.
+	@categoryCreate {
+		method POST
+		path /api/organizers/categories
+	}
+	reverse_proxy @categoryCreate {$JAVA_UPSTREAM}
 	@toolList {
 		method GET
 		path /api/organizers/tools
 	}
 	reverse_proxy @toolList {$JAVA_UPSTREAM}
+	@toolCreate {
+		method POST
+		path /api/organizers/tools
+	}
+	reverse_proxy @toolCreate {$JAVA_UPSTREAM}
+	@shoppingListGet {
+		method GET
+		path /api/households/shopping/lists
+	}
+	reverse_proxy @shoppingListGet {$JAVA_UPSTREAM}
+	@householdStatisticsGet {
+		method GET
+		path /api/households/statistics
+	}
+	reverse_proxy @householdStatisticsGet {$JAVA_UPSTREAM}
 	reverse_proxy {$PYTHON_UPSTREAM}
 }

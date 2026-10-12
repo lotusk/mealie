@@ -50,6 +50,17 @@ public final class FilterEntities {
     public static final FilterEntity FOOD_LABEL = new FilterEntity("MultiPurposeLabel", "multi_purpose_labels",
             Set.of("shopping_list_items", "shopping_lists_label_settings"));
 
+    public static final FilterEntity SHOPPING_LIST = new FilterEntity("ShoppingList", "shopping_lists",
+            Set.of("extras", "label_settings", "list_items", "recipe_references", "group"));
+    private static final FilterEntity SHOPPING_LIST_GROUP = new FilterEntity("Group", "groups", Set.of())
+            .column("name", ColumnType.STRING).column("slug", ColumnType.STRING).baseColumns();
+    private static final FilterEntity SHOPPING_LIST_USER = new FilterEntity("User", "users", Set.of())
+            .column("full_name", ColumnType.STRING).column("username", ColumnType.STRING)
+            .column("group_id", ColumnType.GUID).column("household_id", ColumnType.GUID).baseColumns()
+            .relation("group", () -> SHOPPING_LIST_GROUP, "groups", false, "groups.id = users.group_id")
+            .relation("household", () -> HOUSEHOLD, "households", false,
+                    "households.id = users.household_id");
+
     static {
         FOOD.baseColumns().column("group_id", ColumnType.GUID).column("name", ColumnType.STRING)
                 .column("plural_name", ColumnType.STRING).column("description", ColumnType.STRING)
@@ -83,6 +94,15 @@ public final class FilterEntities {
                 .column("color", ColumnType.STRING)
                 .relation("group", () -> GROUP, "groups", false, "groups.id = multi_purpose_labels.group_id")
                 .relation("foods", () -> FOOD, "ingredient_foods", true, "multi_purpose_labels.id = ingredient_foods.label_id");
+
+        SHOPPING_LIST.baseColumns().column("group_id", ColumnType.GUID).column("user_id", ColumnType.GUID)
+                .column("name", ColumnType.STRING)
+                .relation("user", () -> SHOPPING_LIST_USER, "users", false,
+                        "users.id = shopping_lists.user_id")
+                .relation("group", () -> SHOPPING_LIST_GROUP, "groups", false,
+                        "groups.id = shopping_lists.group_id")
+                .proxy("household_id", "user", "household_id")
+                .proxy("household", "user", "household");
 
         GROUP.column("name", ColumnType.STRING).column("slug", ColumnType.STRING).baseColumns()
                 .relation("households", () -> HOUSEHOLD, "households", true, "groups.id = households.group_id")

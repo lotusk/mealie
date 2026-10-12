@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.ShoppingListMapper">
+
+    <resultMap id="shoppingListRow" type="io.mealie.backend.persistence.model.ShoppingListRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="group_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="user_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="household_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="created_at" javaType="java.time.OffsetDateTime" typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+            <arg column="updated_at" javaType="java.time.OffsetDateTime" typeHandler="io.mealie.backend.persistence.typehandler.OffsetDateTimeTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="extraRow" type="io.mealie.backend.persistence.model.ShoppingListExtraRow">
+        <constructor>
+            <idArg column="shopping_list_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="key_name" javaType="java.lang.String"/><arg column="value" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+    <resultMap id="recipeRefRow" type="io.mealie.backend.persistence.model.ShoppingListRecipeRefRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="shopping_list_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="recipe_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="recipe_quantity" javaType="java.lang.Double"/>
+        </constructor>
+    </resultMap>
+    <resultMap id="labelSettingRow" type="io.mealie.backend.persistence.model.ShoppingListLabelSettingRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="shopping_list_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="label_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="position" javaType="java.lang.Integer"/>
+            <arg column="group_id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="color" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <select id="count" resultType="long">SELECT count(*) FROM shopping_lists JOIN users ON users.id = shopping_lists.user_id WHERE ${where.sql}</select>
+
+    <select id="page" resultMap="shoppingListRow">
+        SELECT shopping_lists.id, shopping_lists.group_id, shopping_lists.user_id, users.household_id,
+               shopping_lists.name, shopping_lists.created_at, shopping_lists.update_at AS updated_at
+        FROM shopping_lists JOIN users ON users.id = shopping_lists.user_id
+        WHERE ${where.sql}
+        <if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+        <choose><when test="limit != null">LIMIT #{limit}</when><when test="sqlite">LIMIT -1</when></choose>
+        OFFSET #{offset}
+    </select>
+
+    <resultMap id="idRow" type="io.mealie.backend.persistence.model.IdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID" typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+
+    <select id="ids" resultMap="idRow">
+        SELECT shopping_lists.id FROM shopping_lists JOIN users ON users.id = shopping_lists.user_id
+        WHERE ${where.sql}<if test="order != null and !order.isEmpty()">ORDER BY ${order.sql}</if>
+    </select>
+
+    <select id="extras" resultMap="extraRow">
+        SELECT shopping_list_id, key_name, value FROM shopping_list_extras WHERE shopping_list_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, javaType=java.lang.Object}
+        </foreach>
+    </select>
+
+    <select id="recipeReferences" resultMap="recipeRefRow">
+        SELECT id, shopping_list_id, recipe_id, recipe_quantity FROM shopping_list_recipe_reference
+        WHERE shopping_list_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, javaType=java.lang.Object}
+        </foreach>
+    </select>
+
+    <select id="labelSettings" resultMap="labelSettingRow">
+        SELECT settings.id, settings.shopping_list_id, settings.label_id, settings.position,
+               labels.group_id, labels.name, labels.color
+        FROM shopping_lists_multi_purpose_labels settings
+        JOIN multi_purpose_labels labels ON labels.id = settings.label_id
+        WHERE settings.shopping_list_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id, javaType=java.lang.Object}
+        </foreach>
+        ORDER BY settings.shopping_list_id, settings.position
+    </select>
+</mapper>

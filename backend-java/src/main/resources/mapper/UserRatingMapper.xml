@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.UserRatingMapper">
+    <resultMap id="recipeId" type="io.mealie.backend.persistence.model.IdRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+        </constructor>
+    </resultMap>
+    <resultMap id="ratingRow" type="io.mealie.backend.persistence.model.UserRatingWriteRow">
+        <constructor>
+            <idArg column="id" javaType="java.util.UUID"
+                   typeHandler="io.mealie.backend.persistence.typehandler.UuidTypeHandler"/>
+            <arg column="rating" javaType="java.lang.Double"/>
+            <arg column="is_favorite" javaType="java.lang.Boolean"/>
+        </constructor>
+    </resultMap>
+    <select id="findRecipe" resultMap="recipeId">
+        SELECT id FROM recipes WHERE group_id = #{groupId}
+        <choose>
+            <when test="id != null">AND id = #{id}</when>
+            <otherwise>AND slug = #{slug}</otherwise>
+        </choose>
+    </select>
+    <select id="findRating" resultMap="ratingRow">
+        SELECT id, rating, is_favorite FROM users_to_recipes
+        WHERE user_id = #{userId} AND recipe_id = #{recipeId}
+    </select>
+    <insert id="insert">
+        INSERT INTO users_to_recipes (id, user_id, recipe_id, rating, is_favorite, created_at, update_at)
+        VALUES (#{id}, #{userId}, #{recipeId}, #{rating, jdbcType=DOUBLE}, #{favorite}, #{now}, #{now})
+    </insert>
+    <update id="update">
+        UPDATE users_to_recipes
+        SET rating = #{rating, jdbcType=DOUBLE}, is_favorite = #{favorite}, update_at = #{now}
+        WHERE id = #{id} AND user_id = #{userId} AND recipe_id = #{recipeId}
+    </update>
+    <update id="recalculate">
+        UPDATE recipes
+        SET rating = (SELECT avg(rating) FROM users_to_recipes WHERE recipe_id = #{recipeId} AND rating &gt; 0),
+            update_at = #{now}
+        WHERE id = #{recipeId} AND group_id = #{groupId}
+    </update>
+</mapper>
