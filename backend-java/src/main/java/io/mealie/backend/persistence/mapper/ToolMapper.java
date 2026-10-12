@@ -9,6 +9,12 @@ import org.apache.ibatis.annotations.Param;
 
 public interface ToolMapper {
 
+    int insert(@Param("id") Object id, @Param("groupId") Object groupId, @Param("name") String name,
+            @Param("slug") String slug, @Param("onHand") Object onHand, @Param("timestamp") Object timestamp);
+
+    int insertHouseholds(@Param("toolId") Object toolId, @Param("groupId") Object groupId,
+            @Param("slugs") List<String> slugs);
+
     long count(@Param("where") SqlFragment where);
 
     List<ToolRow> page(@Param("where") SqlFragment where, @Param("order") SqlFragment order,

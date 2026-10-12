@@ -4,6 +4,21 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.mealie.backend.persistence.mapper.ToolMapper">
 
+    <insert id="insert">
+        INSERT INTO tools (id, group_id, name, slug, on_hand, created_at, update_at)
+        VALUES (#{id}, #{groupId}, #{name}, #{slug}, #{onHand}, #{timestamp}, #{timestamp})
+    </insert>
+
+    <insert id="insertHouseholds">
+        INSERT INTO households_to_tools (household_id, tool_id)
+        SELECT households.id, #{toolId}
+        FROM households
+        WHERE households.group_id = #{groupId} AND households.slug IN
+        <foreach collection="slugs" item="slug" open="(" separator=", " close=")">
+            #{slug}
+        </foreach>
+    </insert>
+
     <resultMap id="toolRow" type="io.mealie.backend.persistence.model.ToolRow">
         <constructor>
             <idArg column="id" javaType="java.util.UUID"

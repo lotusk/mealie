@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.mealie.backend.persistence.mapper.HouseholdStatisticsMapper">
+
+    <resultMap id="householdStatisticsRow" type="io.mealie.backend.persistence.model.HouseholdStatisticsRow">
+        <constructor>
+            <arg column="total_recipes" javaType="_long"/>
+            <arg column="total_users" javaType="_long"/>
+            <arg column="total_categories" javaType="_long"/>
+            <arg column="total_tags" javaType="_long"/>
+            <arg column="total_tools" javaType="_long"/>
+        </constructor>
+    </resultMap>
+
+    <select id="calculate" resultMap="householdStatisticsRow">
+        SELECT
+            (SELECT COUNT(*)
+             FROM recipes
+             WHERE recipes.group_id = #{groupId}
+                <choose>
+                    <when test="householdId != null">
+                        AND EXISTS (
+                            SELECT 1
+                            FROM users recipe_users
+                            WHERE recipe_users.id = recipes.user_id
+                              AND recipe_users.household_id = #{householdId}
+                        )
+                    </when>
+                    <otherwise>
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM users recipe_users
+                            WHERE recipe_users.id = recipes.user_id
+                              AND recipe_users.household_id IS NOT NULL
+                        )
+                    </otherwise>
+                </choose>) AS total_recipes,
+            (SELECT COUNT(*) FROM users WHERE group_id = #{groupId}
+                <choose>
+                    <when test="householdId != null">AND household_id = #{householdId}</when>
+                    <otherwise>AND household_id IS NULL</otherwise>
+                </choose>) AS total_users,
+            (SELECT COUNT(*) FROM categories WHERE group_id = #{groupId}) AS total_categories,
+            (SELECT COUNT(*) FROM tags WHERE group_id = #{groupId}) AS total_tags,
+            (SELECT COUNT(*) FROM tools WHERE group_id = #{groupId}) AS total_tools
+    </select>
+</mapper>
